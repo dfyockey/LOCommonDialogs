@@ -93,25 +93,22 @@ public class loInputBox {
 		xContext = getContext();
 		xMCF = xContext.getServiceManager();
 		createDialog(xMCF, xContext);
-			   
+		
 		initialize (
 			new String[] { "Height", "Moveable", "Name", "PositionX", "PositionY", "Step", "TabIndex", "Title", "Width" },
-			new Object[] {
-							dialogheight, Boolean.TRUE, "MyTestDialog", Integer.valueOf(102),Integer.valueOf(41),
-							Integer.valueOf(0), Short.valueOf((short) 0), "LibreOffice", dialogwidth
-						 }
+			new Object[] { dialogheight, true, "MyTestDialog", 102, 41, 0, 0, "LibreOffice", dialogwidth }
 		);
-		   
+   
 		// add dialog controls
 		try {
-			guiLabel		= insertFixedText(margin, margin, labelwidth, labelheight, 0, "Input something!");
-			guiEditBox	= insertEditField(margin, margin+labelheight+gap, fieldwidth, fieldheight);
-			guiOKBtn		= insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value);
+			guiLabel	 = insertFixedText(margin, margin, labelwidth, labelheight, 0, "Input something!");
+			guiEditBox	 = insertEditField(margin, margin+labelheight+gap, fieldwidth, fieldheight);
+			guiOKBtn	 = insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value);
 			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value);
 		} catch (com.sun.star.uno.Exception e) {
 			e.printStackTrace(System.err);
 		}
-		       
+       
 		getWindowPeer();
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
@@ -127,6 +124,10 @@ public class loInputBox {
 	    m_xComponent = UnoRuntime.queryInterface(XComponent.class, m_xDialogControl);
 	    
 	    return xDialog.execute();
+	}
+	
+	public String getText() {
+		return guiEditBox.getText();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -244,43 +245,18 @@ public class loInputBox {
 	}
 	
 	public void initialize(String[] PropertyNames, Object[] PropertyValues) {
-		try{
+		try {
 			XMultiPropertySet xMultiPropertySet = UnoRuntime.queryInterface(XMultiPropertySet.class, m_xDlgModelNameContainer);
 			xMultiPropertySet.setPropertyValues(PropertyNames, PropertyValues);
 		} catch (com.sun.star.uno.Exception ex) {
 			ex.printStackTrace(System.err);
 		}
 	}
-	   
+	
 	public static String createUniqueName(XNameAccess _xElementContainer, String _sElementName) {
 		int i=1;
 		while ( _xElementContainer.hasByName(_sElementName + Integer.toString(i)) )
 			++i;
 		return _sElementName + Integer.toString(i);
 	}
-   
-	//////////////////////////////////////////////////////////////////////
-
-   public static void main(String args[]) {
-	   loInputBox oUnoDialogSample = null;
-
-       try {
-    	   oUnoDialogSample = new loInputBox();
-           short dlgResult = show(oUnoDialogSample, "LibreOffice InputBox", "Type in some text:", "Type the text here");
-           System.out.println(oUnoDialogSample.guiEditBox.getText());
-           System.out.println(Integer.toString(dlgResult));
-       } catch ( Exception e ) {
-           System.err.println( e + e.getMessage());
-           e.printStackTrace();
-       } finally{
-           //make sure always to dispose the component and free the memory!
-           if (oUnoDialogSample != null){
-               if (loInputBox.m_xComponent != null){
-                   loInputBox.m_xComponent.dispose();
-               }
-           }
-       }
-
-       System.exit( 0 );
-   }
 }
