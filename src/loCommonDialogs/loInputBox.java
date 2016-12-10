@@ -58,36 +58,36 @@ import com.sun.star.uno.XComponentContext;
 
 public class loInputBox {
 	
-	protected static XMultiServiceFactory	m_xMSFDialogModel;
-	protected static XNameContainer			m_xDlgModelNameContainer;
-	protected static XControlContainer		m_xDlgContainer;
-	protected static XControl				m_xDialogControl;
-	protected static XDialog				xDialog;
-	protected static XWindowPeer			m_xWindowPeer	= null;
-	protected static XComponent				m_xComponent 	= null;
-	protected static XComponentContext 		xContext		= null;
-	protected static XMultiComponentFactory xMCF			= null;
+	protected XMultiServiceFactory		m_xMSFDialogModel;
+	protected XNameContainer			m_xDlgModelNameContainer;
+	protected XControlContainer			m_xDlgContainer;
+	protected XControl					m_xDialogControl;
+	protected XDialog					xDialog;
+	protected XWindowPeer				m_xWindowPeer	= null;
+	protected XComponent				m_xComponent 	= null;
+	protected XComponentContext 		xContext		= null;
+	protected XMultiComponentFactory	xMCF			= null;
 	
 	// Dialog and Control Size & Position Values
-	protected static int margin			= 8;
-	protected static int fieldwidth		= 120;	// Should be >= btngap+(2*btnwidth)
-	protected static int fieldheight	= 12;
-	protected static int labelwidth		= fieldwidth;
-	protected static int labelheight	= 8;
-	protected static int btnwidth		= 32;
-	protected static int btnheight		= 14;
-	protected static int gap			= 3;
-	protected static int btnvertpos		= margin + labelheight + fieldheight + (2*gap);
-	protected static int OKhorizpos		= margin + fieldwidth - (2*btnwidth) - gap;
-	protected static int Cancelhorizpos	= margin + fieldwidth - btnwidth;
-	protected static int dialogwidth	= (2*margin) + fieldwidth;
-	protected static int dialogheight	= btnvertpos + btnheight + margin;
+	protected int margin			= 8;
+	protected int fieldwidth		= 120;	// Should be >= btngap+(2*btnwidth)
+	protected int fieldheight		= 12;
+	protected int labelwidth		= fieldwidth;
+	protected int labelheight		= 8;
+	protected int btnwidth			= 32;
+	protected int btnheight			= 14;
+	protected int gap				= 3;
+	protected int btnvertpos		= margin + labelheight + fieldheight + (2*gap);
+	protected int OKhorizpos		= margin + fieldwidth - (2*btnwidth) - gap;
+	protected int Cancelhorizpos	= margin + fieldwidth - btnwidth;
+	protected int dialogwidth		= (2*margin) + fieldwidth;
+	protected int dialogheight		= btnvertpos + btnheight + margin;
 
 	// Control Return Value Storage
-	protected static XFixedText		guiLabel;
-	protected static XTextComponent	guiEditBox;
-	protected static XButton		guiOKBtn;
-	protected static XButton		guiCancelBtn;
+	protected XFixedText		guiLabel;
+	protected XTextComponent	guiEditBox;
+	protected XButton			guiOKBtn;
+	protected XButton			guiCancelBtn;
 	
 	public loInputBox() {
 		xContext = getContext();
@@ -96,7 +96,7 @@ public class loInputBox {
 		
 		initialize (
 			new String[] { "Height", "Moveable", "Name", "PositionX", "PositionY", "Step", "TabIndex", "Title", "Width" },
-			new Object[] { dialogheight, true, "MyTestDialog", 102, 41, 0, 0, "LibreOffice", dialogwidth }
+			new Object[] { dialogheight, true, "MyTestDialog", 102, 41, 0, (short)0, "LibreOffice", dialogwidth }
 		);
    
 		// add dialog controls
@@ -114,7 +114,7 @@ public class loInputBox {
 	}
 
    
-	public static short show(loInputBox hBox, String title, String labeltext, String edittext){
+	public short show(loInputBox hBox, String title, String labeltext, String edittext){
 		xDialog.setTitle(title);
 		guiLabel.setText(labeltext);
 		guiEditBox.setText(edittext);
@@ -226,7 +226,7 @@ public class loInputBox {
         return xContext;
 	}
 	
-	public static XWindowPeer getWindowPeer() {
+	public XWindowPeer getWindowPeer() {
 		if (m_xWindowPeer == null) {
 			try {
 				XWindow xWindow = UnoRuntime.queryInterface(XWindow.class, m_xDlgContainer);
@@ -253,7 +253,7 @@ public class loInputBox {
 		}
 	}
 	
-	public static String createUniqueName(XNameAccess _xElementContainer, String _sElementName) {
+	public String createUniqueName(XNameAccess _xElementContainer, String _sElementName) {
 		int i=1;
 		while ( _xElementContainer.hasByName(_sElementName + Integer.toString(i)) )
 			++i;
