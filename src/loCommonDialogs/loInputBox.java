@@ -35,6 +35,7 @@ package loCommonDialogs;
 *************************************************************************/
 
 import com.sun.star.awt.PushButtonType;
+import com.sun.star.awt.Rectangle;
 import com.sun.star.awt.XButton;
 import com.sun.star.awt.XControl;
 import com.sun.star.awt.XControlContainer;
@@ -50,13 +51,14 @@ import com.sun.star.awt.XWindowPeer;
 import com.sun.star.beans.XMultiPropertySet;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNameContainer;
+import com.sun.star.frame.XModel;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-public class loInputBox {
+public class loInputBox implements AutoCloseable {
 	
 	protected XMultiServiceFactory		m_xMSFDialogModel;
 	protected XNameContainer			m_xDlgModelNameContainer;
@@ -82,6 +84,8 @@ public class loInputBox {
 	protected int Cancelhorizpos	= margin + fieldwidth - btnwidth;
 	protected int dialogwidth		= (2*margin) + fieldwidth;
 	protected int dialogheight		= btnvertpos + btnheight + margin;
+	protected int dialogxpos 		= 0;
+	protected int dialogypos 		= 0;
 
 	// Control Return Value Storage
 	protected XFixedText		guiLabel;
@@ -96,7 +100,7 @@ public class loInputBox {
 		
 		initialize (
 			new String[] { "Height", "Moveable", "Name", "PositionX", "PositionY", "Step", "TabIndex", "Title", "Width" },
-			new Object[] { dialogheight, true, "MyTestDialog", 102, 41, 0, (short)0, "LibreOffice", dialogwidth }
+			new Object[] { dialogheight, true, "MyTestDialog", dialogxpos, dialogypos, 0, (short)0, "LibreOffice", dialogwidth }
 		);
    
 		// add dialog controls
@@ -113,8 +117,8 @@ public class loInputBox {
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
 
-   
-	public short show(loInputBox hBox, String title, String labeltext, String edittext){
+	
+	public short show(XModel xDoc, String title, String labeltext, String edittext) {
 		xDialog.setTitle(title);
 		guiLabel.setText(labeltext);
 		guiEditBox.setText(edittext);
@@ -122,6 +126,8 @@ public class loInputBox {
 		getWindowPeer();
 	    xDialog		 = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	    m_xComponent = UnoRuntime.queryInterface(XComponent.class, m_xDialogControl);
+
+		centerBox(xDoc);	    
 	    
 	    return xDialog.execute();
 	}
@@ -129,6 +135,28 @@ public class loInputBox {
 	public String getText() {
 		return guiEditBox.getText();
 	}
+	
+	private void centerBox(XModel xDoc) {
+		XWindow loWindow = xDoc.getCurrentController().getFrame().getContainerWindow();
+		Rectangle loWindowRect = loWindow.getPosSize();
+		dialogxpos = (loWindowRect.Width / 2) - (dialogwidth  / 2) - loWindowRect.X;
+		dialogypos = (loWindowRect.Height / 2) - (dialogheight / 2) - loWindowRect.Y;
+		guiEditBox.setText(Integer.toString(dialogxpos) + "," + Integer.toString(dialogypos) + " -- " + loWindowRect.X + "," + loWindowRect.Y);
+		XControlModel oDialogModel = m_xDialogControl.getModel();
+		XMultiPropertySet xMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oDialogModel);
+		try {
+			xMPSet.setPropertyValues( new String[]{"PositionX", "PositionY"},new Object[]{dialogxpos, dialogypos});
+		} catch (Exception e) {
+			// Do nothing. Dialog will be positioned wherever it was previously.
+		}
+	}
+
+	public void close() throws Exception {
+		// Dispose the component and free the memory...
+        if (m_xComponent != null){
+            m_xComponent.dispose();
+        }		
+	}	
 
 	//////////////////////////////////////////////////////////////////////
 	//////////  Control Insert Methods  //////////////////////////////////
