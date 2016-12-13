@@ -34,6 +34,7 @@ package loCommonDialogs;
 *
 *************************************************************************/
 
+import com.sun.star.awt.Point;
 import com.sun.star.awt.PushButtonType;
 import com.sun.star.awt.Rectangle;
 import com.sun.star.awt.XButton;
@@ -46,6 +47,7 @@ import com.sun.star.awt.XReschedule;
 import com.sun.star.awt.XTextComponent;
 import com.sun.star.awt.XToolkit;
 import com.sun.star.awt.XTopWindow;
+import com.sun.star.awt.XUnitConversion;
 import com.sun.star.awt.XWindow;
 import com.sun.star.awt.XWindowPeer;
 import com.sun.star.beans.XMultiPropertySet;
@@ -57,6 +59,7 @@ import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+import com.sun.star.util.MeasureUnit;
 
 public class loInputBox implements AutoCloseable {
 	
@@ -116,7 +119,6 @@ public class loInputBox implements AutoCloseable {
 		getWindowPeer();
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
-
 	
 	public short show(XModel xDoc, String title, String labeltext, String edittext) {
 		xDialog.setTitle(title);
@@ -127,28 +129,13 @@ public class loInputBox implements AutoCloseable {
 	    xDialog		 = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	    m_xComponent = UnoRuntime.queryInterface(XComponent.class, m_xDialogControl);
 
-		centerBox(xDoc);	    
+		centerBox(xDoc);
 	    
 	    return xDialog.execute();
 	}
 	
 	public String getText() {
 		return guiEditBox.getText();
-	}
-	
-	private void centerBox(XModel xDoc) {
-		XWindow loWindow = xDoc.getCurrentController().getFrame().getContainerWindow();
-		Rectangle loWindowRect = loWindow.getPosSize();
-		dialogxpos = (loWindowRect.Width / 2) - (dialogwidth  / 2) - loWindowRect.X;
-		dialogypos = (loWindowRect.Height / 2) - (dialogheight / 2) - loWindowRect.Y;
-		guiEditBox.setText(Integer.toString(dialogxpos) + "," + Integer.toString(dialogypos) + " -- " + loWindowRect.X + "," + loWindowRect.Y);
-		XControlModel oDialogModel = m_xDialogControl.getModel();
-		XMultiPropertySet xMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oDialogModel);
-		try {
-			xMPSet.setPropertyValues( new String[]{"PositionX", "PositionY"},new Object[]{dialogxpos, dialogypos});
-		} catch (Exception e) {
-			// Do nothing. Dialog will be positioned wherever it was previously.
-		}
 	}
 
 	public void close() throws Exception {
@@ -236,7 +223,36 @@ public class loInputBox implements AutoCloseable {
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
-	}   
+	} 
+	
+	private void centerBox(XModel xDoc) {
+		XWindow loWindow = xDoc.getCurrentController().getFrame().getContainerWindow();
+		Rectangle loWindowRect = loWindow.getPosSize();
+		
+		Point ptWinSizePixels = new Point(loWindowRect.Width,loWindowRect.Height);
+		
+		// The following two lines of code were inspired by code at
+		// https://github.com/qt-haiku/LibreOffice/blob/master/toolkit/qa/complex/toolkit/UnitConversion.java
+		// where an XWindowPeer is used as the Object in the queryInterface call.
+		//
+		// They work great, but I've been unable to find where XWindowPeer or XWindow implementation or inheritance
+		// of the XUnitConversion interface is documented...
+		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loWindow);
+		Point ptWinSizeDialog = m_xConversion.convertPointToLogic(ptWinSizePixels, MeasureUnit.APPFONT);
+		
+		dialogxpos = (int)( (ptWinSizeDialog.X / 2.0) - (dialogwidth  / 2.0) );
+		dialogypos = (int)( (ptWinSizeDialog.Y / 2.0) - (dialogheight / 2.0) );
+		
+		guiEditBox.setText(Integer.toString(dialogxpos) + "," + Integer.toString(dialogypos) + " -- " + ptWinSizeDialog.X + "," + ptWinSizeDialog.Y);
+
+		XControlModel oDialogModel = m_xDialogControl.getModel();
+		XMultiPropertySet xMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oDialogModel);
+		try {
+			xMPSet.setPropertyValues( new String[]{"PositionX", "PositionY"},new Object[]{dialogxpos, dialogypos});
+		} catch (Exception e) {
+			// Do nothing. Dialog will be positioned wherever it was previously.
+		}
+	}
    
 	private XComponentContext getContext() {
 		if (xContext == null) {
@@ -254,7 +270,7 @@ public class loInputBox implements AutoCloseable {
         return xContext;
 	}
 	
-	public XWindowPeer getWindowPeer() {
+	private XWindowPeer getWindowPeer() {
 		if (m_xWindowPeer == null) {
 			try {
 				XWindow xWindow = UnoRuntime.queryInterface(XWindow.class, m_xDlgContainer);
@@ -272,7 +288,7 @@ public class loInputBox implements AutoCloseable {
 		return m_xWindowPeer;
 	}
 	
-	public void initialize(String[] PropertyNames, Object[] PropertyValues) {
+	private void initialize(String[] PropertyNames, Object[] PropertyValues) {
 		try {
 			XMultiPropertySet xMultiPropertySet = UnoRuntime.queryInterface(XMultiPropertySet.class, m_xDlgModelNameContainer);
 			xMultiPropertySet.setPropertyValues(PropertyNames, PropertyValues);
@@ -281,7 +297,7 @@ public class loInputBox implements AutoCloseable {
 		}
 	}
 	
-	public String createUniqueName(XNameAccess _xElementContainer, String _sElementName) {
+	private String createUniqueName(XNameAccess _xElementContainer, String _sElementName) {
 		int i=1;
 		while ( _xElementContainer.hasByName(_sElementName + Integer.toString(i)) )
 			++i;
