@@ -1,9 +1,17 @@
 package loCommonDialogs;
 
+// Title  : loInputBox - Java class to display a simple inputbox in a LibreOffice document
+// Author : David Yockey
+// Email  : software@diffengine.net
+//
+// Based on UnoDialogSample.java, located at http://api.libreoffice.org/examples/DevelopersGuide/GUI/UnoDialogSample.java
+
 /*************************************************************************
 *
 *  The Contents of this file are made available subject to the terms of
-*  the BSD license.
+*  the 3-clause BSD license.
+*  
+*  Copyright 2016 David Yockey
 *
 *  Copyright 2000, 2010 Oracle and/or its affiliates.
 *  All rights reserved.
@@ -16,9 +24,10 @@ package loCommonDialogs;
 *  2. Redistributions in binary form must reproduce the above copyright
 *     notice, this list of conditions and the following disclaimer in the
 *     documentation and/or other materials provided with the distribution.
-*  3. Neither the name of Sun Microsystems, Inc. nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
+*  3. Neither the name of the Author, the name of Sun Microsystems, Inc.,
+*     nor the names of its contributors may be used to endorse or promote
+*     products derived from this software without specific prior written
+*     permission.
 *
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -33,6 +42,22 @@ package loCommonDialogs;
 *  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *************************************************************************/
+
+
+/*
+// USAGE INFORMATION
+//
+// Instantiate loInputBox, and then call show() with appropriate values
+// for its parameters to display an inputbox.  Upon return, call getText()
+// to retrieve text typed in the inputbox's edit box.
+//
+// Do NOT call close(). It will be called automatically when necessary.
+
+ * Return Values:
+ * 
+ * Returns 0 on Cancel, 1 on OK
+*/
+
 
 import com.sun.star.awt.Point;
 import com.sun.star.awt.PushButtonType;
@@ -62,7 +87,7 @@ import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.MeasureUnit;
 
 public class loInputBox implements AutoCloseable {
-	
+		
 	protected XMultiServiceFactory		m_xMSFDialogModel;
 	protected XNameContainer			m_xDlgModelNameContainer;
 	protected XControlContainer			m_xDlgContainer;
@@ -231,26 +256,24 @@ public class loInputBox implements AutoCloseable {
 		
 		Point ptWinSizePixels = new Point(loWindowRect.Width,loWindowRect.Height);
 		
-		// The following two lines of code were inspired by code at
+		// The following two lines of code, using XWindow loWindow, were inspired by code at
 		// https://github.com/qt-haiku/LibreOffice/blob/master/toolkit/qa/complex/toolkit/UnitConversion.java
 		// where an XWindowPeer is used as the Object in the queryInterface call.
 		//
-		// They work great, but I've been unable to find where XWindowPeer or XWindow implementation or inheritance
-		// of the XUnitConversion interface is documented...
+		// These lines work great, but I've been unable to find where XWindowPeer or XWindow implementation
+		// or inheritance of the XUnitConversion interface is documented...
 		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loWindow);
 		Point ptWinSizeDialog = m_xConversion.convertPointToLogic(ptWinSizePixels, MeasureUnit.APPFONT);
 		
 		dialogxpos = (int)( (ptWinSizeDialog.X / 2.0) - (dialogwidth  / 2.0) );
 		dialogypos = (int)( (ptWinSizeDialog.Y / 2.0) - (dialogheight / 2.0) );
-		
-		guiEditBox.setText(Integer.toString(dialogxpos) + "," + Integer.toString(dialogypos) + " -- " + ptWinSizeDialog.X + "," + ptWinSizeDialog.Y);
 
 		XControlModel oDialogModel = m_xDialogControl.getModel();
 		XMultiPropertySet xMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oDialogModel);
 		try {
 			xMPSet.setPropertyValues( new String[]{"PositionX", "PositionY"},new Object[]{dialogxpos, dialogypos});
 		} catch (Exception e) {
-			// Do nothing. Dialog will be positioned wherever it was previously.
+			// Do nothing. Dialog will be positioned at position 0,0 or wherever it was previously.
 		}
 	}
    
