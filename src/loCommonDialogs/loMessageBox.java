@@ -93,7 +93,7 @@ public class loMessageBox {
 		
 			// Initialize the message box factory
 			XMessageBoxFactory messageBoxFactory = (XMessageBoxFactory) UnoRuntime.queryInterface(XMessageBoxFactory.class,parentWindowPeer.getToolkit());
-			XMessageBox box = messageBoxFactory.createMessageBox(parentWindowPeer, messageBoxType, messageBoxButtons, messageBoxTitle, message) ;
+			XMessageBox box = messageBoxFactory.createMessageBox(parentWindowPeer, messageBoxType, messageBoxButtons, messageBoxTitle, message);
 			return box.execute();
 		} catch (Exception e) {
 			return -1;

@@ -48,7 +48,7 @@ package loCommonDialogs;
 // USAGE INFORMATION
 //
 // Instantiate loInputBox, and then call show() with appropriate values
-// for its parameters to display an inputbox.  Upon return, call getText()
+// for its parameters to display an inputbox.  Upon return, call gettext()
 // to retrieve text typed in the inputbox's edit box.
 //
 // Do NOT call close(). It will be called automatically when necessary.
@@ -159,7 +159,7 @@ public class loInputBox implements AutoCloseable {
 	    return xDialog.execute();
 	}
 	
-	public String getText() {
+	public String gettext() {
 		return guiEditBox.getText();
 	}
 
