@@ -47,7 +47,7 @@ package loCommonDialogs;
 
  * Parameter messageBoxButtons:
  * 
- * com::sun::star::awt::MessageBoxButtons Constant Group
+ * com.sun.star.awt.MessageBoxButtons Constant Group
  *
 	const long 	BUTTONS_OK 					= 1			specifies a message with "OK" button.
 	const long 	BUTTONS_OK_CANCEL			= 2			specifies a message box with "OK" and "CANCEL" button.
