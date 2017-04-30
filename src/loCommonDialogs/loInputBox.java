@@ -123,6 +123,15 @@ public class loInputBox implements AutoCloseable {
 	
 	public loInputBox() {
 		xContext = getContext();
+		initInputBox();
+	}
+	
+	public loInputBox(XComponentContext xComponentContext) {
+		xContext = xComponentContext;
+		initInputBox();
+	}
+	
+	private void initInputBox() {
 		xMCF = xContext.getServiceManager();
 		createDialog(xMCF, xContext);
 		
@@ -142,7 +151,7 @@ public class loInputBox implements AutoCloseable {
 		}
        
 		getWindowPeer();
-		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
+		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);		
 	}
 	
 	public short show(XModel xDoc, String title, String labeltext, String edittext) {
