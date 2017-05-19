@@ -144,8 +144,8 @@ public class loInputBox implements AutoCloseable {
 		try {
 			guiLabel	 = insertFixedText(margin, margin, labelwidth, labelheight, 0, "Input something!");
 			guiEditBox	 = insertEditField(margin, margin+labelheight+gap, fieldwidth, fieldheight);
-			guiOKBtn	 = insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value);
-			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value);
+			guiOKBtn	 = insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value,		true );
+			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, false);
 		} catch (com.sun.star.uno.Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -214,11 +214,11 @@ public class loInputBox implements AutoCloseable {
 		return (XTextComponent) _insertPostProc(XTextComponent.class, xMPSet);
 	}
    
-	public XButton insertButton(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _sLabel, short _nPushButtonType) throws com.sun.star.uno.Exception {
+	public XButton insertButton(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _sLabel, short _nPushButtonType, boolean _bDefaultButton) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Button", "com.sun.star.awt.UnoControlButtonModel");
 		xMPSet.setPropertyValues(
-			new String[]  {"Height", "Label", "PositionX", "PositionY", "PushButtonType", "Width" },	// Remember: Alphabetical Order!
-			new Object[] {_nHeight, _sLabel, _nPosX, _nPosY, _nPushButtonType, _nWidth});
+			new String[] {"DefaultButton", "Height", "Label", "PositionX", "PositionY", "PushButtonType", "Width" },	// Remember: Alphabetical Order!
+			new Object[] {_bDefaultButton, _nHeight, _sLabel, _nPosX, _nPosY, _nPushButtonType, _nWidth});
 		return (XButton) _insertPostProc(XButton.class, xMPSet);
 	}
    
@@ -228,7 +228,7 @@ public class loInputBox implements AutoCloseable {
 		XControl xControl = m_xDlgContainer.getControl((String)sName[0]);
 		return UnoRuntime.queryInterface(c, xControl);
 	}
-
+	
 	//////////////////////////////////////////////////////////////////////
 	//////////  Utility Methods  /////////////////////////////////////////
 
