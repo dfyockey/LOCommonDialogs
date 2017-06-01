@@ -21,49 +21,36 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.MeasureUnit;
 
-public class loDialogBox implements AutoCloseable {
+public abstract class loDialogBox implements AutoCloseable {
 	
-	private XComponentContext		xContext	  = null;
-	private XMultiComponentFactory	xMCF		  = null;
-	private XWindowPeer				m_xWindowPeer = null;
-	private XDialog					xDialog		  = null;
-	private XComponent				m_xComponent  = null;
+	protected XComponentContext		 xContext		= null;
+	protected XMultiComponentFactory xMCF			= null;
+	protected XWindowPeer			 m_xWindowPeer 	= null;
+	protected XDialog				 xDialog		= null;
+	protected XComponent			 m_xComponent	= null;
 	
 	// Variables set by createDialog method
-	private XMultiServiceFactory m_xMSFDialogModel;
-	private XNameContainer		 m_xDlgModelNameContainer;
-	private XControlContainer	 m_xDlgContainer;
-	private XControl			 m_xDialogControl;
+	protected XMultiServiceFactory 	m_xMSFDialogModel;
+	protected XNameContainer		m_xDlgModelNameContainer;
+	protected XControlContainer		m_xDlgContainer;
+	protected XControl				m_xDialogControl;
 	
 	// Dialog initialization values
-	private int dialogwidth	 = 200;
-	private int dialogheight = 75;
-	private int dialogxpos 	 = 0;
-	private int dialogypos 	 = 0;
+	protected int dialogwidth  = 200;
+	protected int dialogheight = 75;
+	protected int dialogxpos   = 0;
+	protected int dialogypos   = 0;
 	
 	
-	public loDialogBox(String dialogname) {
+	public loDialogBox() {
 		xContext = getContext();
-		initDialogBox(dialogname);
 	}
 	
-	public loDialogBox(String dialogname, XComponentContext xComponentContext) {
+	public loDialogBox(XComponentContext xComponentContext) {
 		xContext = xComponentContext;
-		initDialogBox(dialogname);
 	}
 	
-	private void initDialogBox(String dialogname) {
-		xMCF = xContext.getServiceManager();
-		createDialog(xMCF, xContext);
-		
-		initialize (
-			new String[] { "Height", "Moveable", "Name", "PositionX", "PositionY", "Step", "TabIndex", "Title", "Width" },
-			new Object[] { dialogheight, true, dialogname, dialogxpos, dialogypos, 0, (short)0, "loDialogBox", dialogwidth }
-		);
-       
-		m_xWindowPeer = getWindowPeer();
-		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);		
-	}
+	protected abstract void initBox();
 	
 	public short show(XModel xDoc, String title) {
 		xDialog.setTitle(title);
@@ -131,7 +118,7 @@ public class loDialogBox implements AutoCloseable {
 		}
 	}
 	
-	private void initialize(String[] PropertyNames, Object[] PropertyValues) {
+	protected void initialize(String[] PropertyNames, Object[] PropertyValues) {
 		try {
 			XMultiPropertySet xMultiPropertySet = UnoRuntime.queryInterface(XMultiPropertySet.class, m_xDlgModelNameContainer);
 			xMultiPropertySet.setPropertyValues(PropertyNames, PropertyValues);
@@ -140,7 +127,7 @@ public class loDialogBox implements AutoCloseable {
 		}
 	}
 	
-	private XWindowPeer getWindowPeer() {
+	protected XWindowPeer getWindowPeer() {
 		if (m_xWindowPeer == null) {
 			try {
 				XWindow xWindow = UnoRuntime.queryInterface(XWindow.class, m_xDlgContainer);
@@ -158,7 +145,7 @@ public class loDialogBox implements AutoCloseable {
 		return m_xWindowPeer;
 	}
 	
-	private void centerBox(XModel xDoc) {
+	protected void centerBox(XModel xDoc) {
 		XWindow loWindow = xDoc.getCurrentController().getFrame().getContainerWindow();
 		Rectangle loWindowRect = loWindow.getPosSize();
 		
