@@ -44,15 +44,18 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			
 			guiLabel	 = insertFixedText(margin, margin, labelwidth, labelheight, 0, "Input something!");
 			
+			//// In the following, return values from com.sun.star.awt.MessageBoxResults are used for choice buttons
+			//// to make loChoiceBox a drop-in replacement for a XMessageBox-based Yes/No/Cancel messagebox.
+			
 			// Button 2
 			guiChoiceBtn2 = insertButton(Btn2horizpos, btnvertpos, btnwidth, btnheight, "Choice 2", (short) PushButtonType.STANDARD_value, false );
-			guiChoiceBtn2.setActionCommand("2");
+			guiChoiceBtn2.setActionCommand("2");	// String is converted to (short)2 on click, equal to com.sun.star.awt.MessageBoxResults.YES
 			ActionListenerImpl xBtn2Listener = new ActionListenerImpl();
 			guiChoiceBtn2.addActionListener(xBtn2Listener);
 			
 			// Button 1
 			guiChoiceBtn1 = insertButton(Btn1horizpos, btnvertpos, btnwidth, btnheight, "Choice 1", (short) PushButtonType.STANDARD_value, false );
-			guiChoiceBtn1.setActionCommand("1");
+			guiChoiceBtn1.setActionCommand("3");	// String is converted to (short)3 on click, equal to com.sun.star.awt.MessageBoxResults.NO
 			ActionListenerImpl xBtn1Listener = new ActionListenerImpl();
 			guiChoiceBtn1.addActionListener(xBtn1Listener);
 						
@@ -71,11 +74,10 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		guiLabel.setText(labeltext);
 		guiChoiceBtn2.setLabel(btnlabel2);
 		guiChoiceBtn1.setLabel(btnlabel1);
-		btnclicked = 0;
 		
-		short Result = super.show(xDoc, title);
-		System.out.println(btnclicked);
-		return Result;
+		btnclicked = 0;
+			super.show(xDoc, title);	// If one of the choice buttons is clicked, the associated ActionListenerImpl changes btnclicked accordingly.
+		return btnclicked;
 	}
 	
 	public class ActionListenerImpl extends com.sun.star.lib.uno.helper.WeakBase implements XActionListener
