@@ -2,16 +2,20 @@ package loCommonDialogs;
 
 import com.sun.star.awt.Point;
 import com.sun.star.awt.Rectangle;
+import com.sun.star.awt.XButton;
 import com.sun.star.awt.XControl;
 import com.sun.star.awt.XControlContainer;
 import com.sun.star.awt.XControlModel;
 import com.sun.star.awt.XDialog;
+import com.sun.star.awt.XFixedText;
 import com.sun.star.awt.XReschedule;
+import com.sun.star.awt.XTextComponent;
 import com.sun.star.awt.XToolkit;
 import com.sun.star.awt.XUnitConversion;
 import com.sun.star.awt.XWindow;
 import com.sun.star.awt.XWindowPeer;
 import com.sun.star.beans.XMultiPropertySet;
+import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNameContainer;
 import com.sun.star.frame.XModel;
 import com.sun.star.lang.XComponent;
@@ -34,6 +38,20 @@ public abstract class loDialogBox implements AutoCloseable {
 	protected XNameContainer		m_xDlgModelNameContainer;
 	protected XControlContainer		m_xDlgContainer;
 	protected XControl				m_xDialogControl;
+
+	// Dialog and Control Size & Position Default Values
+	// usable by derived classes to facilitate providing
+	// consistent dialog appearance
+	protected int margin		= 8;
+	protected int fieldwidth	= 120;	// Should be >= btngap+(2*btnwidth)
+	protected int fieldheight	= 12;
+	protected int fieldborderwidth = 3;	// Width of the border around an edit field
+	protected int labelwidth	= fieldwidth;
+	protected int labelheight	= 8;
+	protected int labelborderwidth = 1;	// Width of the border around a label
+	protected int btnwidth		= 32;
+	protected int btnheight		= 14;
+	protected int gap			= 3;
 	
 	// Dialog initialization values
 	protected int dialogwidth  = 200;
@@ -50,13 +68,13 @@ public abstract class loDialogBox implements AutoCloseable {
 		xContext = xComponentContext;
 	}
 	
+	// ABSTRACT METHOD
 	protected abstract void initBox();
 	
 	public short show(XModel xDoc, String title) {
 		xDialog.setTitle(title);
 		
 		getWindowPeer();
-	    //xDialog	= UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	    
 	    // The following line sets m_xComponent for use in the close() method
 	    m_xComponent = UnoRuntime.queryInterface(XComponent.class, m_xDialogControl);
@@ -73,6 +91,56 @@ public abstract class loDialogBox implements AutoCloseable {
             m_xComponent = null;
         }
 	}
+	
+	//////////////////////////////////////////////////////////////////////
+	//////////  Control Insert Methods  //////////////////////////////////
+	
+	private XMultiPropertySet _insertPreProc(String controlname, String fullmodel) throws com.sun.star.uno.Exception {
+		// create a unique name by means of an own implementation...
+		String sName = createUniqueName(m_xDlgModelNameContainer, controlname);
+		
+		// create a controlmodel at the multiservicefactory of the dialog model...
+        Object oFTModel = m_xMSFDialogModel.createInstance(fullmodel);
+        XMultiPropertySet xFTModelMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oFTModel);
+        
+        xFTModelMPSet.setPropertyValues(new String[]{"Name"},new Object[]{sName});
+        
+        // add the model to the NameContainer of the dialog model
+        m_xDlgModelNameContainer.insertByName(sName, oFTModel);
+        
+        return xFTModelMPSet;
+	}
+	
+	protected XFixedText insertFixedText(int _nPosX, int _nPosY, int _nWidth, int _nHeight, int _nStep, String _sLabel) throws com.sun.star.uno.Exception {
+		XMultiPropertySet xMPSet = _insertPreProc("Label", "com.sun.star.awt.UnoControlFixedTextModel");
+		xMPSet.setPropertyValues(
+			new String[] {"Border", "Height", "Label", "PositionX", "PositionY", "Step", "Width"},		// Remember: Alphabetical Order!
+			new Object[] {(short)0, _nHeight, _sLabel, _nPosX, _nPosY, _nStep, _nWidth});
+		return (XFixedText) _insertPostProc(XFixedText.class, xMPSet);
+	}
+	
+	protected XTextComponent insertEditField(int _nPosX, int _nPosY, int _nWidth, int _nHeight) throws com.sun.star.uno.Exception {
+		XMultiPropertySet xMPSet = _insertPreProc("TextField", "com.sun.star.awt.UnoControlEditModel");
+		xMPSet.setPropertyValues(
+			new String[] {"Border", "Height", "PositionX", "PositionY", "Text", "Width"},		// Remember: Alphabetical Order!
+			new Object[] {(short)1, _nHeight, _nPosX, _nPosY, "MyText", _nWidth});
+		return (XTextComponent) _insertPostProc(XTextComponent.class, xMPSet);
+	}
+   
+	protected XButton insertButton(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _sLabel, short _nPushButtonType, boolean _bDefaultButton) throws com.sun.star.uno.Exception {
+		XMultiPropertySet xMPSet = _insertPreProc("Button", "com.sun.star.awt.UnoControlButtonModel");
+		xMPSet.setPropertyValues(
+			new String[] {"DefaultButton", "Height", "Label", "PositionX", "PositionY", "PushButtonType", "Width" },	// Remember: Alphabetical Order!
+			new Object[] {_bDefaultButton, _nHeight, _sLabel, _nPosX, _nPosY, _nPushButtonType, _nWidth});
+		return (XButton) _insertPostProc(XButton.class, xMPSet);
+	}	
+	
+	private Object _insertPostProc(Class<?> c, XMultiPropertySet xMPSet) {
+		// Return the interface for the specified class
+		Object[] sName = xMPSet.getPropertyValues( new String[]{"Name"});
+		XControl xControl = m_xDlgContainer.getControl((String)sName[0]);
+		return UnoRuntime.queryInterface(c, xControl);
+	}	
 	
 	//////////////////////////////////////////////////////////////////////
 	//////////  Utility Methods  /////////////////////////////////////////
@@ -170,5 +238,12 @@ public abstract class loDialogBox implements AutoCloseable {
 		} catch (Exception e) {
 			// Do nothing. Dialog will be positioned at position 0,0 or wherever it was previously.
 		}
+	}
+	
+	private String createUniqueName(XNameAccess _xElementContainer, String _sElementName) {
+		int i=1;
+		while ( _xElementContainer.hasByName(_sElementName + Integer.toString(i)) )
+			++i;
+		return _sElementName + Integer.toString(i);
 	}
 }

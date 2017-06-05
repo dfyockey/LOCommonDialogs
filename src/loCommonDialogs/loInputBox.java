@@ -75,16 +75,9 @@ import com.sun.star.uno.XComponentContext;
 public class loInputBox extends loDialogBox implements AutoCloseable {
 		
 	// Dialog and Control Size & Position Values
-	protected int margin			= 8;
-	protected int fieldwidth		= 120;	// Should be >= btngap+(2*btnwidth)
-	protected int fieldheight		= 12;
-	protected int labelwidth		= fieldwidth;
-	protected int labelheight		= 8;
-	protected int btnwidth			= 32;
-	protected int btnheight			= 14;
-	protected int gap				= 3;
-	protected int btnvertpos		= margin + labelheight + fieldheight + (2*gap);
-	protected int OKhorizpos		= margin + fieldwidth - (2*btnwidth) - gap;
+	protected int fieldvertpos		= margin+labelheight+2*labelborderwidth+fieldborderwidth+gap;
+	protected int btnvertpos		= margin + labelheight + 2*labelborderwidth + fieldheight + 2*fieldborderwidth + 3*gap;
+	protected int OKhorizpos		= margin + fieldwidth - 2*btnwidth - gap;
 	protected int Cancelhorizpos	= margin + fieldwidth - btnwidth;
 
 	// Control Return Value Storage
@@ -92,11 +85,6 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 	protected XTextComponent	guiEditBox;
 	protected XButton			guiOKBtn;
 	protected XButton			guiCancelBtn;
-	
-	public loInputBox() {
-		super();
-		initBox();
-	}
 	
 	public loInputBox(XComponentContext xComponentContext) {
 		super(xComponentContext);
@@ -120,7 +108,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		// add dialog controls
 		try {
 			guiLabel	 = insertFixedText(margin, margin, labelwidth, labelheight, 0, "Input something!");
-			guiEditBox	 = insertEditField(margin, margin+labelheight+gap, fieldwidth, fieldheight);
+			guiEditBox	 = insertEditField(margin, fieldvertpos, fieldwidth, fieldheight);
 			guiOKBtn	 = insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value,		true );
 			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, false);
 		} catch (com.sun.star.uno.Exception e) {
@@ -132,17 +120,9 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 	}
 	
 	public short show(XModel xDoc, String title, String labeltext, String edittext) {
-		xDialog.setTitle(title);
 		guiLabel.setText(labeltext);
 		guiEditBox.setText(edittext);
-		
-		getWindowPeer();
-	    xDialog		 = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
-	    m_xComponent = UnoRuntime.queryInterface(XComponent.class, m_xDialogControl);
-
-		centerBox(xDoc);
-	    
-	    return xDialog.execute();
+		return super.show(xDoc, title);
 	}
 	
 	public String gettext() {
@@ -155,64 +135,4 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
             m_xComponent.dispose();
         }		
 	}	
-
-	//////////////////////////////////////////////////////////////////////
-	//////////  Control Insert Methods  //////////////////////////////////
-	
-	private XMultiPropertySet _insertPreProc(String controlname, String fullmodel) throws com.sun.star.uno.Exception {
-		// create a unique name by means of an own implementation...
-		String sName = createUniqueName(m_xDlgModelNameContainer, controlname);
-		
-		// create a controlmodel at the multiservicefactory of the dialog model...
-        Object oFTModel = m_xMSFDialogModel.createInstance(fullmodel);
-        XMultiPropertySet xFTModelMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oFTModel);
-        
-        xFTModelMPSet.setPropertyValues(new String[]{"Name"},new Object[]{sName});
-        
-        // add the model to the NameContainer of the dialog model
-        m_xDlgModelNameContainer.insertByName(sName, oFTModel);
-        
-        return xFTModelMPSet;
-	}
-	
-	private XFixedText insertFixedText(int _nPosX, int _nPosY, int _nWidth, int _nHeight, int _nStep, String _sLabel) throws com.sun.star.uno.Exception {
-		XMultiPropertySet xMPSet = _insertPreProc("Label", "com.sun.star.awt.UnoControlFixedTextModel");
-		xMPSet.setPropertyValues(
-			new String[] {"Height", "Label", "PositionX", "PositionY", "Step", "Width"},		// Remember: Alphabetical Order!
-			new Object[] { _nHeight, _sLabel, _nPosX, _nPosY, _nStep, _nWidth});
-		return (XFixedText) _insertPostProc(XFixedText.class, xMPSet);
-	}
-   
-	private XTextComponent insertEditField(int _nPosX, int _nPosY, int _nWidth, int _nHeight) throws com.sun.star.uno.Exception {
-		XMultiPropertySet xMPSet = _insertPreProc("TextField", "com.sun.star.awt.UnoControlEditModel");
-		xMPSet.setPropertyValues(
-			new String[] {"Height", "PositionX", "PositionY", "Text", "Width"},		// Remember: Alphabetical Order!
-			new Object[] { _nHeight, _nPosX, _nPosY, "MyText", _nWidth});
-		return (XTextComponent) _insertPostProc(XTextComponent.class, xMPSet);
-	}
-   
-	public XButton insertButton(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _sLabel, short _nPushButtonType, boolean _bDefaultButton) throws com.sun.star.uno.Exception {
-		XMultiPropertySet xMPSet = _insertPreProc("Button", "com.sun.star.awt.UnoControlButtonModel");
-		xMPSet.setPropertyValues(
-			new String[] {"DefaultButton", "Height", "Label", "PositionX", "PositionY", "PushButtonType", "Width" },	// Remember: Alphabetical Order!
-			new Object[] {_bDefaultButton, _nHeight, _sLabel, _nPosX, _nPosY, _nPushButtonType, _nWidth});
-		return (XButton) _insertPostProc(XButton.class, xMPSet);
-	}
-   
-	private Object _insertPostProc(Class<?> c, XMultiPropertySet xMPSet) {
-		// Return the interface for the specified class
-		Object[] sName = xMPSet.getPropertyValues( new String[]{"Name"});
-		XControl xControl = m_xDlgContainer.getControl((String)sName[0]);
-		return UnoRuntime.queryInterface(c, xControl);
-	}
-	
-	//////////////////////////////////////////////////////////////////////
-	//////////  Utility Methods  /////////////////////////////////////////
-
-	private String createUniqueName(XNameAccess _xElementContainer, String _sElementName) {
-		int i=1;
-		while ( _xElementContainer.hasByName(_sElementName + Integer.toString(i)) )
-			++i;
-		return _sElementName + Integer.toString(i);
-	}
 }
