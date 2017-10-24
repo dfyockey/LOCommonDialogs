@@ -61,14 +61,10 @@ package loCommonDialogs;
 
 import com.sun.star.awt.PushButtonType;
 import com.sun.star.awt.XButton;
-import com.sun.star.awt.XControl;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
 import com.sun.star.awt.XTextComponent;
-import com.sun.star.beans.XMultiPropertySet;
-import com.sun.star.container.XNameAccess;
 import com.sun.star.frame.XModel;
-import com.sun.star.lang.XComponent;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
@@ -129,10 +125,10 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		return guiEditBox.getText();
 	}
 
-	public void close() throws Exception {
+	public void close() {
 		// Dispose the component and free the memory...
         if (m_xComponent != null){
             m_xComponent.dispose();
-        }		
-	}	
+        }
+	}
 }

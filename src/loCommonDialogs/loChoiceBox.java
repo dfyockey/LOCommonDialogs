@@ -23,6 +23,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 	private XFixedText	guiLabel;
 	private XButton		guiChoiceBtn2;
 	private XButton		guiChoiceBtn1;
+	@SuppressWarnings("unused")
 	private XButton		guiCancelBtn;
 	
 	public loChoiceBox(XComponentContext xComponentContext) {
@@ -95,10 +96,10 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		}
 	};
 	
-	public void close() throws Exception {
+	public void close() {
 		// Dispose the component and free the memory...
         if (m_xComponent != null){
             m_xComponent.dispose();
-        }		
+        }
 	}
 }

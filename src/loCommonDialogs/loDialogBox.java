@@ -84,7 +84,7 @@ public abstract class loDialogBox implements AutoCloseable {
 	    return xDialog.execute();
 	}
 	
-	public void close() throws Exception {
+	public void close() {
 		// Dispose the component and free the memory...
         if (m_xComponent != null){
             m_xComponent.dispose();
