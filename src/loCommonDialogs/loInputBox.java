@@ -91,7 +91,9 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		xMCF = xContext.getServiceManager();
 		createDialog(xMCF, xContext);
 		
-		dialogwidth  = (2*margin) + fieldwidth;
+		dialogwidth	 = 200;
+		fieldwidth	 = dialogwidth - (2*margin);
+		labelwidth	 = fieldwidth;
 		dialogheight = btnvertpos + btnheight + margin;
 		dialogxpos   = 0;
 		dialogypos   = 0;
@@ -103,7 +105,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		
 		// add dialog controls
 		try {
-			guiLabel	 = insertFixedText(margin, margin, labelwidth, labelheight, 0, "Input something!");
+			guiLabel	 = insertFixedText((short)0, margin, margin, labelwidth, labelheight, 0, "Input something!");
 			guiEditBox	 = insertEditField(margin, fieldvertpos, fieldwidth, fieldheight);
 			guiOKBtn	 = insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value,		true );
 			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, false);

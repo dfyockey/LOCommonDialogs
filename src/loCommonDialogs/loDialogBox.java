@@ -1,5 +1,8 @@
 package loCommonDialogs;
 
+import com.sun.star.awt.FontDescriptor;
+import com.sun.star.awt.FontSlant;
+import com.sun.star.awt.ImageScaleMode;
 import com.sun.star.awt.Point;
 import com.sun.star.awt.Rectangle;
 import com.sun.star.awt.XButton;
@@ -14,10 +17,16 @@ import com.sun.star.awt.XToolkit;
 import com.sun.star.awt.XUnitConversion;
 import com.sun.star.awt.XWindow;
 import com.sun.star.awt.XWindowPeer;
+import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.XMultiPropertySet;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.container.XNameAccess;
 import com.sun.star.container.XNameContainer;
 import com.sun.star.frame.XModel;
+import com.sun.star.graphic.XGraphic;
+import com.sun.star.graphic.XGraphicProvider;
+import com.sun.star.io.XInputStream;
+import com.sun.star.io.XOutputStream;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
@@ -47,15 +56,20 @@ public abstract class loDialogBox implements AutoCloseable {
 	protected int fieldheight	= 12;
 	protected int fieldborderwidth = 3;	// Width of the border around an edit field
 	protected int labelwidth	= fieldwidth;
-	protected int labelheight	= 8;
+	protected int labelheight	= 12;
 	protected int labelborderwidth = 1;	// Width of the border around a label
 	protected int btnwidth		= 32;
 	protected int btnheight		= 14;
 	protected int gap			= 3;
 	
-	// Dialog initialization values
-	protected int dialogwidth  = 200;
-	protected int dialogheight = 75;
+	// Dialog initialization values (in dialog units)
+	
+	protected final int mindialogwidth  = 107;	// These minimum values appear to be either a bug or an undocumented feature.
+	protected final int mindialogheight = 107;	// They are easily demonstrable by previewing a dialog with lesser values
+												// in the LibreOffice Dialog Editor.
+	
+	protected int dialogwidth  = mindialogwidth;
+	protected int dialogheight = mindialogheight;
 	protected int dialogxpos   = 0;
 	protected int dialogypos   = 0;
 	
@@ -72,6 +86,8 @@ public abstract class loDialogBox implements AutoCloseable {
 	protected abstract void initBox();
 	
 	public short show(XModel xDoc, String title) {
+		System.out.println("Hello again from loDialogBox!");
+		
 		xDialog.setTitle(title);
 		
 		getWindowPeer();
@@ -103,6 +119,15 @@ public abstract class loDialogBox implements AutoCloseable {
         Object oFTModel = m_xMSFDialogModel.createInstance(fullmodel);
         XMultiPropertySet xFTModelMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oFTModel);
         
+        // FontDescriptor needs to go in HERE!!!
+        
+        //XPropertySet xFixedTextProps = UnoRuntime.queryInterface(XPropertySet.class, oFTModel);
+        //FontDescriptor fontDescriptor = (FontDescriptor) xFixedTextProps.getPropertyValue("FontDescriptor");
+        //fontDescriptor.Slant = FontSlant.ITALIC;
+        
+//        FontDescriptor fontDescriptor = initFont(oFTModel);
+        
+//        xFTModelMPSet.setPropertyValues(new String[]{"FontDescriptor", "Name"},new Object[]{fontDescriptor, sName});
         xFTModelMPSet.setPropertyValues(new String[]{"Name"},new Object[]{sName});
         
         // add the model to the NameContainer of the dialog model
@@ -111,11 +136,16 @@ public abstract class loDialogBox implements AutoCloseable {
         return xFTModelMPSet;
 	}
 	
-	protected XFixedText insertFixedText(int _nPosX, int _nPosY, int _nWidth, int _nHeight, int _nStep, String _sLabel) throws com.sun.star.uno.Exception {
+	protected XFixedText insertFixedText(short _Align, int _nPosX, int _nPosY, int _nWidth, int _nHeight, int _nStep, String _sLabel) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Label", "com.sun.star.awt.UnoControlFixedTextModel");
+		
+		FontDescriptor fontDescriptor = (FontDescriptor) xMPSet.getPropertyValues(new String[] {"FontDescriptor"})[0];
+			fontDescriptor.Height = 14;
+
 		xMPSet.setPropertyValues(
-			new String[] {"Border", "Height", "Label", "PositionX", "PositionY", "Step", "Width"},		// Remember: Alphabetical Order!
-			new Object[] {(short)0, _nHeight, _sLabel, _nPosX, _nPosY, _nStep, _nWidth});
+			new String[] {"Align", "Border", "FontDescriptor", "Height", "Label", "PositionX", "PositionY", "Step", "Width"},		// Remember: Alphabetical Order!
+			new Object[] {_Align, (short)0, fontDescriptor, _nHeight, _sLabel, _nPosX, _nPosY, _nStep, _nWidth});
+		
 		return (XFixedText) _insertPostProc(XFixedText.class, xMPSet);
 	}
 	
@@ -133,7 +163,28 @@ public abstract class loDialogBox implements AutoCloseable {
 			new String[] {"DefaultButton", "Height", "Label", "PositionX", "PositionY", "PushButtonType", "Width" },	// Remember: Alphabetical Order!
 			new Object[] {_bDefaultButton, _nHeight, _sLabel, _nPosX, _nPosY, _nPushButtonType, _nWidth});
 		return (XButton) _insertPostProc(XButton.class, xMPSet);
-	}	
+	}
+
+	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _ImageURL) throws com.sun.star.uno.Exception {
+		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
+		short _mode = ImageScaleMode.ISOTROPIC;
+		xMPSet.setPropertyValues(
+			new String[] {"Height", "ImageURL", "PositionX", "PositionY", "ScaleMode", "Width"},	// Remember: Alphabetical Order!
+			new Object[] {_nHeight, _ImageURL, _nPosX, _nPosY, _mode, _nWidth});
+		return (XControl) _insertPostProc(XControl.class, xMPSet);
+	}
+	
+	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, byte[] _rawimage) throws com.sun.star.uno.Exception {
+		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
+		short _mode = ImageScaleMode.ISOTROPIC;
+		
+		XGraphic xGraphic = getGraphic(_rawimage);
+		
+		xMPSet.setPropertyValues(
+			new String[] {"Graphic", "Height", "PositionX", "PositionY", "ScaleMode", "Width"},	// Remember: Alphabetical Order!
+			new Object[] {xGraphic, _nHeight, _nPosX, _nPosY, _mode, _nWidth});
+		return (XControl) _insertPostProc(XControl.class, xMPSet);
+	}
 	
 	private Object _insertPostProc(Class<?> c, XMultiPropertySet xMPSet) {
 		// Return the interface for the specified class
@@ -161,6 +212,8 @@ public abstract class loDialogBox implements AutoCloseable {
         return xContext;
 	}
 	
+	// With very small changes to this class, createDialog could just use protected variables xMFC and xContext
+	// rather than requiring these values to be passed as arguments, or they could be passed and assigned here.
 	protected void createDialog(XMultiComponentFactory _xMCF, XComponentContext _xContext) {
 		try {
 			Object oDialogModel =  _xMCF.createInstanceWithContext("com.sun.star.awt.UnoControlDialogModel", _xContext);
@@ -181,9 +234,60 @@ public abstract class loDialogBox implements AutoCloseable {
 			// link the dialog and its model...
 			XControlModel xControlModel = UnoRuntime.queryInterface(XControlModel.class, oDialogModel);
 			m_xDialogControl.setModel(xControlModel);
+			
+			//initFixedText(_xMCF, _xContext);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
+	}
+	
+	private XGraphic getGraphic(byte[] _rawimage) throws com.sun.star.uno.Exception {
+		
+		Object oPipe = xMCF.createInstanceWithContext("com.sun.star.io.Pipe", xContext);
+		
+		// Nonintuitivly, we use an *XOutputStream* to write the image info *into* the Pipe...
+		XOutputStream xOStream = UnoRuntime.queryInterface(XOutputStream.class, oPipe);
+		xOStream.writeBytes(_rawimage);
+		xOStream.closeOutput();
+		
+		XInputStream xIStream = UnoRuntime.queryInterface(XInputStream.class, oPipe);
+		
+        //PropertyValue[] mediaProps = new PropertyValue[3];
+        PropertyValue[] mediaProps = new PropertyValue[2];
+        mediaProps[0] = new PropertyValue();
+        mediaProps[0].Name = "InputStream";
+        mediaProps[0].Value = xIStream;
+//        mediaProps[0].Name = "URL";
+//        mediaProps[0].Value = "file:///home/David/Pictures/Happy.jpg";        
+        //mediaProps[1] = new PropertyValue();
+        //mediaProps[1].Name = "OutputStream";
+        //mediaProps[1].Value = xOStream;
+        mediaProps[1] = new PropertyValue();
+        mediaProps[1].Name = "MimeType";
+        mediaProps[1].Value = "image/jpg";
+	
+		// Instantiate a GraphicProvider
+		Object oGraphicProvider = xMCF.createInstanceWithContext("com.sun.star.graphic.GraphicProvider", xContext);
+		XGraphicProvider xGraphicProvider = UnoRuntime.queryInterface(XGraphicProvider.class, oGraphicProvider);
+		
+		XGraphic xGraphic = xGraphicProvider.queryGraphic(mediaProps);
+
+		String xGP = (xGraphicProvider!=null)?"OK!":"NULL!";
+		String xG = (xGraphic!=null)?"OK!":"NULL!";
+		
+		System.out.println("xGraphicProvider " + xGP + "  " + "xGraphic " + xG);
+		
+		return xGraphic;
+	}
+	
+	private FontDescriptor initFont (Object oFTModel) throws com.sun.star.uno.Exception {		
+		XPropertySet xFixedTextProps = UnoRuntime.queryInterface(XPropertySet.class, oFTModel);
+		FontDescriptor fontDescriptor = (FontDescriptor) xFixedTextProps.getPropertyValue("FontDescriptor");
+		
+		fontDescriptor.Slant = FontSlant.ITALIC;
+		fontDescriptor.Height = 12;
+		
+		return fontDescriptor;
 	}
 	
 	protected void initialize(String[] PropertyNames, Object[] PropertyValues) {
