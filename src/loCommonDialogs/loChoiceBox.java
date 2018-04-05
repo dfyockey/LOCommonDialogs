@@ -116,7 +116,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			//guiImage = insertImage(15, 15, 35, 42, rawimageHappy);
 			//guiImage = insertImage(15, 15, 35, 42, rawimageRose);
 			
-			guiImage = insertImage(margin, 15, 32, 44, hexbinaryChild);
+			guiImage = insertImage(margin, 15, 32, 44, hexbinaryChild, "jpg");
 			//guiImage = insertImage(15, 15, 32, 32, hexbinaryChild);
 			
 			

@@ -52,6 +52,10 @@ import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.MeasureUnit;
 
 public abstract class loDialogBox implements AutoCloseable {
+
+	static short textalign_left = 0;
+	static short textalign_center = 1;
+	static short textalign_right = 2;
 	
 	protected XComponentContext		 xContext		= null;
 	protected XMultiComponentFactory xMCF			= null;
@@ -69,7 +73,7 @@ public abstract class loDialogBox implements AutoCloseable {
 	// usable by derived classes to facilitate providing
 	// consistent dialog appearance
 	protected int iconsize		= 16;
-	protected int margin		= 8;
+	protected int margin		= 4;
 	protected int fieldwidth	= 120;	// Should be >= btngap+(2*btnwidth)
 	protected int fieldheight	= 12;
 	protected int fieldborderwidth = 3;	// Width of the border around an edit field
@@ -198,12 +202,20 @@ public abstract class loDialogBox implements AutoCloseable {
 		
 		//int h = _nHeight * 2;
 			
+		//int bkColor = 16514043;	// #FBFBFB
+		
 		xMPSet.setPropertyValues(
 			//new String[] {"Align", "Border", "FontDescriptor", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "Width"},		// Remember: Alphabetical Order!
 			//new Object[] {_Align, (short)1, fontDescriptor, h, _sLabel, true, _nPosX, _nPosY, _nStep, _nWidth});
 		
-			new String[] {"Align", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
-			new Object[] {_Align, _nHeight, _sLabel, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
+				
+				
+			//new String[] {"Align", "BackgroundColor", "Border", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
+			//new Object[] {_Align, bkColor, (short)0, _nHeight, _sLabel, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
+		
+			new String[] {"Align", "Border", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
+			new Object[] {_Align, (short)0, _nHeight, _sLabel, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
+
 		
 		XFixedText xFixedText = (XFixedText) _insertPostProc(XFixedText.class, xMPSet);
 		
@@ -267,22 +279,32 @@ public abstract class loDialogBox implements AutoCloseable {
 
 	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _ImageURL) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
-		short _mode = ImageScaleMode.ISOTROPIC;
+		short _mode = ImageScaleMode.NONE;
 		xMPSet.setPropertyValues(
 			new String[] {"Border", "Height", "ImageURL", "PositionX", "PositionY", "ScaleMode", "Width"},	// Remember: Alphabetical Order!
 			new Object[] {(short)0, _nHeight, _ImageURL, _nPosX, _nPosY, _mode, _nWidth});
 		return (XControl) _insertPostProc(XControl.class, xMPSet);
 	}
 	
-	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, byte[] _ImageHexbinary) throws com.sun.star.uno.Exception {
+	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, byte[] _ImageHexbinary, String imgtype) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
 		short _mode = ImageScaleMode.NONE;
 		
-		XGraphic xGraphic = getGraphic(_ImageHexbinary);
+		XGraphic xGraphic = getGraphic(_ImageHexbinary, imgtype);
+		
+		//int borderColor = 16514043;	// #FBFBFB
 		
 		xMPSet.setPropertyValues(
 			new String[] {"Border", "Graphic", "Height", "PositionX", "PositionY", "ScaleMode", "Width"},	// Remember: Alphabetical Order!
 			new Object[] {(short)0, xGraphic, _nHeight, _nPosX, _nPosY, _mode, _nWidth});
+		return (XControl) _insertPostProc(XControl.class, xMPSet);
+	}
+	
+	protected XControl insertFixedLine(int _nPosX, int _nPosY, int _nWidth, int _nHeight) throws com.sun.star.uno.Exception {
+		XMultiPropertySet xMPSet = _insertPreProc("Line", "com.sun.star.awt.UnoControlFixedLineModel");
+		xMPSet.setPropertyValues(
+				new String[] {"Enabled", "Height", "PositionX", "PositionY", "Width"},	// Remember: Alphabetical Order!
+				new Object[] {true, _nHeight, _nPosX, _nPosY, _nWidth});
 		return (XControl) _insertPostProc(XControl.class, xMPSet);
 	}
 	
@@ -341,7 +363,7 @@ public abstract class loDialogBox implements AutoCloseable {
 		}
 	}
 	
-	private XGraphic getGraphic(byte[] _rawimage) throws com.sun.star.uno.Exception {
+	protected XGraphic getGraphic(byte[] _rawimage, String imgtype) throws com.sun.star.uno.Exception {
 		
 		Object oPipe = xMCF.createInstanceWithContext("com.sun.star.io.Pipe", xContext);
 		
@@ -364,7 +386,7 @@ public abstract class loDialogBox implements AutoCloseable {
         //mediaProps[1].Value = xOStream;
         mediaProps[1] = new PropertyValue();
         mediaProps[1].Name = "MimeType";
-        mediaProps[1].Value = "image/jpg";
+        mediaProps[1].Value = "image/" + imgtype;
 	
 		// Instantiate a GraphicProvider
 		Object oGraphicProvider = xMCF.createInstanceWithContext("com.sun.star.graphic.GraphicProvider", xContext);
