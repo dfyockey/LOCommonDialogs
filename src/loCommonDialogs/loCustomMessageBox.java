@@ -12,6 +12,7 @@ import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
 import com.sun.star.awt.XStyleSettings;
 import com.sun.star.awt.XStyleSettingsSupplier;
+import com.sun.star.awt.XWindow;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XModel;
 import com.sun.star.graphic.XGraphic;
@@ -19,14 +20,15 @@ import com.sun.star.report.XFixedLine;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-import loCommonDialogs.loChoiceBox.ActionListenerImpl;
-
 public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	
-	static int iconMessage	= 0;
-	static int iconWarning	= 1;
-	static int iconUsrError	= 2;
-	static int iconSysError = 3;
+	public static int iconMessage	= 0;
+	public static int iconWarning	= 1;
+	public static int iconUsrError	= 2;
+	public static int iconSysError	= 3;
+	
+	public static boolean showCancelBtn = true;
+	public static boolean hideCancelBtn = false;
 	
 	// Dialog and Control Size & Position Values
 	private int labelvertpos, labelhorizpos;
@@ -122,7 +124,13 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	*/
 	
 	public short show(XModel xDoc, String title, String message, String subtext, int iconIndex) {
+		return show(xDoc, title, message, subtext, iconIndex, false);
+	}
+	
+	public short show(XModel xDoc, String title, String message, String subtext, int iconIndex, boolean cancelbtn) {
 		String rawhexPng = null;
+
+		configButtons(cancelbtn);
 		
 		switch (iconIndex) {
 			case 1:
@@ -145,10 +153,15 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	}
 	
 	public short show(XModel xDoc, String title, String message, String subtext, String rawhexPng) {
+		return show(xDoc, title, message, subtext, rawhexPng, false);
+	}
+	
+	public short show(XModel xDoc, String title, String message, String subtext, String rawhexPng, boolean cancelbtn) {
 		// Use MessageBoxType.ERRORBOX for a System Error
 		// Use MessageBoxType.INFOBOX for a User Error
 		// Use MessageBoxType.WARNINGBOX for a Warning
 		
+		configButtons(cancelbtn);
 		
 		// Configure Warning Text to the current Application Font and at size 12pt and BOLD
 		//// Get Label XPropertySet interface
@@ -174,7 +187,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		if ( rawhexPng != null ) {
 			byte[] hexbinaryIcon = DatatypeConverter.parseHexBinary(rawhexPng);
 			
-			// If getGraphic throws, just continue; the default Warning Icon will be used.
+			// If getGraphic throws, just continue; the default icon will be used.
 			try {
 				xGraphic = getGraphic(hexbinaryIcon, "png");
 				
@@ -183,7 +196,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 				XControlModel xIconControlModel = xIconControl.getModel();
 				xIconProps = UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
 			} catch (Exception e) {
-				// nop
+				// nop - there'll just be no custom icon
 			}
 		}
 		
@@ -205,4 +218,27 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		
 		return super.show(xDoc, title);
 	}
+	
+	private void configButtons (boolean cancelbtn) {
+		XControl xCancelBtnControl = UnoRuntime.queryInterface(XControl.class, guiCancelBtn);
+		XPropertySet xCancelBtnProps = UnoRuntime.queryInterface(XPropertySet.class, xCancelBtnControl.getModel());
+		
+		XWindow xCancelBtnWindow = UnoRuntime.queryInterface(XWindow.class, guiCancelBtn);
+		
+		XControl xOKBtnControl = UnoRuntime.queryInterface(XControl.class, guiOKBtn);
+		XPropertySet xOKBtnProps = UnoRuntime.queryInterface(XPropertySet.class, xOKBtnControl.getModel());
+		
+		try {
+			if (cancelbtn) {
+				xOKBtnProps.setPropertyValue("PositionX", dialogwidth/2 - btnwidth - gap/2);
+				xCancelBtnWindow.setVisible(true);
+				xCancelBtnProps.setPropertyValue("PositionX", dialogwidth/2 + gap/2);
+			} else {
+				xOKBtnProps.setPropertyValue("PositionX", dialogwidth/2 - btnwidth/2);
+				xCancelBtnWindow.setVisible(false);
+			}
+		} catch (Exception e) {
+			// nop - buttons will just be misplaced.
+		}
+	}	
 }
