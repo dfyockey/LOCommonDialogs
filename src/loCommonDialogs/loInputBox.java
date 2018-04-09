@@ -1,5 +1,10 @@
 package loCommonDialogs;
 
+import javax.xml.bind.DatatypeConverter;
+
+import com.sun.star.awt.FontDescriptor;
+import com.sun.star.awt.FontWeight;
+
 // Title  : loInputBox - Java class to display a simple inputbox in a LibreOffice document
 // Author : David Yockey
 // Email  : software@diffengine.net
@@ -61,26 +66,36 @@ package loCommonDialogs;
 
 import com.sun.star.awt.PushButtonType;
 import com.sun.star.awt.XButton;
+import com.sun.star.awt.XControl;
+import com.sun.star.awt.XControlModel;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
+import com.sun.star.awt.XStyleSettings;
+import com.sun.star.awt.XStyleSettingsSupplier;
 import com.sun.star.awt.XTextComponent;
+import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XModel;
+import com.sun.star.graphic.XGraphic;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
 public class loInputBox extends loDialogBox implements AutoCloseable {
 		
 	// Dialog and Control Size & Position Values
-	protected int fieldvertpos		= margin+labelheight+2*labelborderwidth+fieldborderwidth+gap;
-	protected int btnvertpos		= margin + labelheight + 2*labelborderwidth + fieldheight + 2*fieldborderwidth + 3*gap;
-	protected int OKhorizpos		= margin + fieldwidth - 2*btnwidth - gap;
-	protected int Cancelhorizpos	= margin + fieldwidth - btnwidth;
-
+	protected int fieldvertpos;
+	protected int fieldhorizpos;
+	protected int btnvertpos;
+	protected int OKhorizpos;		//= dialogwidth/2 - btnwidth - gap/2; //margin + fieldwidth - 2*btnwidth - gap;
+	protected int Cancelhorizpos;	//= dialogwidth/2 + gap/2; //margin + fieldwidth - btnwidth;
+	protected int labelposX;
+	protected int labelposY;
+	
 	// Control Return Value Storage
-	protected XFixedText		guiLabel;
-	protected XTextComponent	guiEditBox;
-	protected XButton			guiOKBtn;
-	protected XButton			guiCancelBtn;
+	private XFixedText		guiLabel;
+	private XTextComponent	guiEditBox;
+	private XButton			guiOKBtn;
+	private XButton			guiCancelBtn;
+	private XControl		guiIcon;
 	
 	public loInputBox(XComponentContext xComponentContext) {
 		super(xComponentContext);
@@ -91,12 +106,20 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		xMCF = xContext.getServiceManager();
 		createDialog(xMCF, xContext);
 		
-		dialogwidth	 = 200;
-		fieldwidth	 = dialogwidth - (2*margin);
-		labelwidth	 = fieldwidth;
-		dialogheight = btnvertpos + btnheight + margin;
-		dialogxpos   = 0;
-		dialogypos   = 0;
+		iconsize		= 32;
+		dialogwidth		= 200;
+		OKhorizpos		= dialogwidth/2 - btnwidth - gap/2;
+		Cancelhorizpos	= dialogwidth/2 + gap/2;
+		btnvertpos		= margin + iconsize + fieldheight + 4*gap;
+		fieldwidth		= dialogwidth/4 - (2*margin);
+		fieldvertpos	= margin + iconsize + gap;
+		fieldhorizpos	= dialogwidth/2 - fieldwidth/2;
+		labelwidth		= dialogwidth - (2*margin) - iconsize - gap;
+		labelposX		= margin + iconsize + gap;
+		labelposY		= margin + iconsize/2 - labelheight/2;
+		dialogheight	= btnvertpos + btnheight + margin;
+		dialogxpos  	= 0;
+		dialogypos  	= 0;
 		
 		initialize (
 				new String[] { "Height", "Moveable", "Name", "PositionX", "PositionY", "Step", "TabIndex", "Title", "Width" },
@@ -105,8 +128,12 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		
 		// add dialog controls
 		try {
-			guiLabel	 = insertFixedText((short)0, margin, margin, labelwidth, labelheight, 0, "Input something!");
-			guiEditBox	 = insertEditField(margin, fieldvertpos, fieldwidth, fieldheight);
+			String rawhexMessage = "";
+			byte[] hexbinaryMessage = DatatypeConverter.parseHexBinary(rawhexMessage);
+			guiIcon = insertImage(margin, margin, iconsize, iconsize, hexbinaryMessage, "png");
+						
+			guiLabel	 = insertFixedText(textalign_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
+			guiEditBox	 = insertEditField(textalign_center, fieldhorizpos, fieldvertpos, fieldwidth, fieldheight);
 			guiOKBtn	 = insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value,		true );
 			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, false);
 		} catch (com.sun.star.uno.Exception e) {
@@ -117,9 +144,52 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
 	
-	public short show(XModel xDoc, String title, String labeltext, String edittext) {
+	public short show(XModel xDoc, String title, String labeltext, String edittext, String rawhexPng) {
+		XPropertySet xIconProps = null;
+		XGraphic 	 xGraphic	= null;
+		
+		// Configure Icon
+		if ( rawhexPng != null ) {
+			byte[] hexbinaryIcon = DatatypeConverter.parseHexBinary(rawhexPng);
+			
+			// If getGraphic throws, just continue; the default icon will be used.
+			try {
+				xGraphic = getGraphic(hexbinaryIcon, "png");
+				
+				//// Get Label XPropertySet interface
+				XControl xIconControl = UnoRuntime.queryInterface(XControl.class, guiIcon);
+				XControlModel xIconControlModel = xIconControl.getModel();
+				xIconProps = UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
+				
+				if (xIconProps != null)
+					xIconProps.setPropertyValue("Graphic", xGraphic);				
+			} catch (Exception e) {
+				// nop - there'll just be no custom icon
+			}
+		}
+		
+		// Configure Inputbox Text to the current Application Font and at size 12pt and BOLD
+		//// Get Label XPropertySet interface
+		XControl xControl = UnoRuntime.queryInterface(XControl.class, guiLabel);
+		XControlModel xControlModel = xControl.getModel();
+		XPropertySet xLabelProps = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
+		
+		//// Get FontDescriptor for Application Font
+		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
+		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
+		FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
+		appFontDescriptor.Height = 12;
+		appFontDescriptor.Weight = FontWeight.BOLD;
+		
+		try {
+			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
+		} catch (Exception e) {
+			// nop - text just won't be bold
+		}
+		
 		guiLabel.setText(labeltext);
 		guiEditBox.setText(edittext);
+		
 		return super.show(xDoc, title);
 	}
 	

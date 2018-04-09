@@ -89,7 +89,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			//guiIcon = insertImage(margin, vmargin, iconsize, iconsize, hexbinaryWarning, "png");
 			
 			guiLabel 	 = insertFixedText(textalign_center, labelhorizpos, labelvertpos, labelwidth, labelheight, 0, "");
-			guiLabel2	 = insertFixedText(textalign_center, margin, labelvertpos + labelheight - gap/2 - gap/4, dialogwidth, labelheight/2, 0, "");
+			guiLabel2	 = insertFixedText(textalign_center, margin, labelvertpos + labelheight - gap, dialogwidth, labelheight/2, 0, "");
 			guiOKBtn 	 = insertButton(okbtnhpos, btnvertpos, btnwidth, btnheight, "OK", (short) PushButtonType.OK_value, true);
 			guiCancelBtn = insertButton(cancelbtnhpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, true);
 			

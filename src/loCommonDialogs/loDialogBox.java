@@ -78,7 +78,7 @@ public abstract class loDialogBox implements AutoCloseable {
 	protected int fieldheight	= 12;
 	protected int fieldborderwidth = 3;	// Width of the border around an edit field
 	protected int labelwidth	= fieldwidth;
-	protected int labelheight	= 12;
+	protected int labelheight	= 24;
 	protected int labelborderwidth = 1;	// Width of the border around a label
 	protected int btnwidth		= 32;
 	protected int btnheight		= 14;
@@ -261,11 +261,11 @@ public abstract class loDialogBox implements AutoCloseable {
 		return xFixedText;
 	}
 	
-	protected XTextComponent insertEditField(int _nPosX, int _nPosY, int _nWidth, int _nHeight) throws com.sun.star.uno.Exception {
+	protected XTextComponent insertEditField(short _Align, int _nPosX, int _nPosY, int _nWidth, int _nHeight) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("TextField", "com.sun.star.awt.UnoControlEditModel");
 		xMPSet.setPropertyValues(
-			new String[] {"Border", "Height", "PositionX", "PositionY", "Text", "Width"},		// Remember: Alphabetical Order!
-			new Object[] {(short)1, _nHeight, _nPosX, _nPosY, "MyText", _nWidth});
+			new String[] {"Align", "Border", "Height", "PositionX", "PositionY", "Text", "Width"},		// Remember: Alphabetical Order!
+			new Object[] {_Align, (short)1, _nHeight, _nPosX, _nPosY, "MyText", _nWidth});
 		return (XTextComponent) _insertPostProc(XTextComponent.class, xMPSet);
 	}
    
@@ -277,6 +277,7 @@ public abstract class loDialogBox implements AutoCloseable {
 		return (XButton) _insertPostProc(XButton.class, xMPSet);
 	}
 
+	// URL-based Image
 	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _ImageURL) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
 		short _mode = ImageScaleMode.NONE;
@@ -286,6 +287,7 @@ public abstract class loDialogBox implements AutoCloseable {
 		return (XControl) _insertPostProc(XControl.class, xMPSet);
 	}
 	
+	// Hexbinary-based Image
 	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, byte[] _ImageHexbinary, String imgtype) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
 		short _mode = ImageScaleMode.NONE;
