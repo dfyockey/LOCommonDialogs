@@ -178,7 +178,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
 		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
 		FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
-		appFontDescriptor.Height = 12;
+		appFontDescriptor.Height = 10;
 		appFontDescriptor.Weight = FontWeight.BOLD;
 		
 		try {

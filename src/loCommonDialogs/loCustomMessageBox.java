@@ -20,6 +20,9 @@ import com.sun.star.report.XFixedLine;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
+// Due to the current inability to match label width to text width and image control to icon size,
+// Centered Buttons, which deemphasize margin discrepancies, are preferred over Right-Justified buttons.
+
 public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	
 	public static int iconMessage	= 0;
@@ -49,16 +52,22 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		gap				= margin;
 		vmargin			= margin;		// Amount to offset everything from the top
 		iconsize		= 32;
-		dialogwidth		= 250;
-		dialogheight	= 60;
+		dialogwidth		= 175;
+		dialogheight	= 65;
 		labelwidth		= dialogwidth - iconsize - (2*margin) - gap;
-		labelheight		= iconsize - gap - 3;
-		labelvertpos	= vmargin + (gap/2);
+		labelheight		= iconsize;
+		labelvertpos	= vmargin;
 		labelhorizpos	= margin + iconsize + gap/2;
-		btnvertpos		= dialogheight - btnheight - margin;
+		btnvertpos		= dialogheight - btnheight - margin; //labelvertpos + labelheight + gap/2 + btnheight;
+		
+		// Centered Buttons
 		okbtnhpos		= dialogwidth/2 - btnwidth - gap/2;
-		//okbtnhpos		= dialogwidth - btnwidth - gap/2 - btnwidth - margin;
 		cancelbtnhpos	= dialogwidth/2 + gap/2;
+		
+		// Right-Justified Buttons
+//		okbtnhpos		= dialogwidth - margin - 2*btnwidth - gap;
+//		cancelbtnhpos	= dialogwidth - margin - btnwidth;		
+		
 		//cancelbtnhpos	= dialogwidth - btnwidth - margin;
 		lineVpos		= labelvertpos + labelheight; //vmargin + iconsize + vmargin;
 		lineHpos		= labelhorizpos; //margin;
@@ -89,7 +98,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			//guiIcon = insertImage(margin, vmargin, iconsize, iconsize, hexbinaryWarning, "png");
 			
 			guiLabel 	 = insertFixedText(textalign_center, labelhorizpos, labelvertpos, labelwidth, labelheight, 0, "");
-			guiLabel2	 = insertFixedText(textalign_center, margin, labelvertpos + labelheight - gap, dialogwidth, labelheight/2, 0, "");
+			guiLabel2	 = insertFixedText(textalign_center, 0, labelvertpos + labelheight - 2, dialogwidth, btnheight/2 + btnheight/4, 0, "");
 			guiOKBtn 	 = insertButton(okbtnhpos, btnvertpos, btnwidth, btnheight, "OK", (short) PushButtonType.OK_value, true);
 			guiCancelBtn = insertButton(cancelbtnhpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, true);
 			
@@ -173,7 +182,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
 		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
 		FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
-		appFontDescriptor.Height = 12;
+		appFontDescriptor.Height = 10;
 		appFontDescriptor.Weight = FontWeight.BOLD;		
 		
 		xControl = UnoRuntime.queryInterface(XControl.class, guiLabel2);
@@ -230,9 +239,17 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		
 		try {
 			if (cancelbtn) {
+				
+				// Centered Buttons
 				xOKBtnProps.setPropertyValue("PositionX", dialogwidth/2 - btnwidth - gap/2);
 				xCancelBtnWindow.setVisible(true);
 				xCancelBtnProps.setPropertyValue("PositionX", dialogwidth/2 + gap/2);
+				
+				// Right-Justified Buttons
+//				xOKBtnProps.setPropertyValue("PositionX", dialogwidth - margin - 2*btnwidth - gap);
+//				xCancelBtnWindow.setVisible(true);
+//				xCancelBtnProps.setPropertyValue("PositionX", dialogwidth - margin - btnwidth);
+				
 			} else {
 				xOKBtnProps.setPropertyValue("PositionX", dialogwidth/2 - btnwidth/2);
 				xCancelBtnWindow.setVisible(false);

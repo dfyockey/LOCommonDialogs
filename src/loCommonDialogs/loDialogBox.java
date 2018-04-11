@@ -213,8 +213,8 @@ public abstract class loDialogBox implements AutoCloseable {
 			//new String[] {"Align", "BackgroundColor", "Border", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
 			//new Object[] {_Align, bkColor, (short)0, _nHeight, _sLabel, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
 		
-			new String[] {"Align", "Border", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
-			new Object[] {_Align, (short)0, _nHeight, _sLabel, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
+			new String[] {"Align", "Border", "Height", "Label", "NoLabel", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
+			new Object[] {_Align, (short)0, _nHeight, _sLabel, true, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
 
 		
 		XFixedText xFixedText = (XFixedText) _insertPostProc(XFixedText.class, xMPSet);
