@@ -31,7 +31,8 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 	short btnclicked = 0;
 	
 	// Dialog and Control Size & Position Values
-	private int labelvertpos;
+	private int labelposX;
+	private int labelposY;
 	private int btnvertpos;
 	private int Btn2horizpos;
 	private int Btn1horizpos;
@@ -45,23 +46,29 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 	@SuppressWarnings("unused")
 	private XButton		guiCancelBtn;
 	
-	public loChoiceBox(XComponentContext xComponentContext, int w, int h) {
+	public loChoiceBox(XComponentContext xComponentContext) {
 		// w = dialog width, h = dialog height, 0 for either = minimum value
 		super(xComponentContext);
 		iconsize		= 32;
-		dialogwidth		= ((w == 0) ? mindialogwidth : w); // + iconsize;
-		dialogheight	= (h == 0) ? mindialogheight : h;
-		labelwidth		= dialogwidth - (2*margin);
-		//labelwidth		= 193;
-		//labelwidth		= 705 + 15;
-		labelvertpos	= 15; //margin + (2*labelheight);
-		btnvertpos		= dialogheight - btnheight - margin - (2*labelheight);	//margin + labelheight + (2*gap);
+		
+		dialogwidth		= 235;
+		//dialogheight	= 0;
+		
+		labelwidth		= dialogwidth - (2*margin) - iconsize - gap;
+		labelheight		= iconsize;
+		labelposX		= margin + iconsize;
+		labelposY		= margin;
+		
+		btnvertpos		= margin + labelheight; // + gap; //(2*gap);  //dialogheight - btnheight - margin - (2*labelheight);	
 		//Btn2horizpos	= dialogwidth - margin - (3*btnwidth) - (2*gap);
 		Btn2horizpos	= (dialogwidth - (3*btnwidth) - (2*gap)) / 2;
 		//Btn1horizpos	= dialogwidth - margin - (2*btnwidth) - gap;
 		Btn1horizpos	= Btn2horizpos + (btnwidth + gap);
 		//Cancelhorizpos	= dialogwidth - margin - btnwidth;
 		Cancelhorizpos	= Btn1horizpos + (btnwidth + gap);
+		
+		dialogheight	= margin + iconsize + btnheight + margin;
+		
 		initBox();
 	}
 	
@@ -79,7 +86,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			short align_left = 0;
 			short align_center = 1;
 			short align_right = 2;
-			guiLabel = insertFixedText(align_center, margin, labelvertpos, labelwidth, labelheight, 0, "Input something!");
+			guiLabel = insertFixedText(align_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
 			//guiLabel = insertFixedText(align_center, margin, labelvertpos, 0, 17, 0, "Input something!");
 /*
 			XLayoutConstrains xLayoutConstrains = UnoRuntime.queryInterface(XLayoutConstrains.class, guiLabel);
@@ -116,7 +123,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			//guiImage = insertImage(15, 15, 35, 42, rawimageHappy);
 			//guiImage = insertImage(15, 15, 35, 42, rawimageRose);
 			
-			guiImage = insertImage(margin, 15, 32, 44, hexbinaryChild, "jpg");
+			guiImage = insertImage(margin, margin, iconsize, iconsize, hexbinaryChild, "jpg");
 			//guiImage = insertImage(15, 15, 32, 32, hexbinaryChild);
 			
 			
@@ -170,7 +177,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		
 		//labelwidth = loTextInfo.getExtent(xDoc, labeltext, "Liberarion Sans", 12, FontWeight.NORMAL);
 		//labelwidth = loTextInfo.getExtent(xDoc, labeltext, xAppFontDescriptor.Name, xAppFontDescriptor.Height, xAppFontDescriptor.Weight);
-		labelwidth = loTextInfo.getExtent(xDoc, labeltext, xAppFontDescriptor);
+		//labelwidth = loTextInfo.getExtent(xDoc, labeltext, xAppFontDescriptor);
 		
 		
 		
@@ -191,9 +198,9 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			*/
 			
 			xLabelProps.setPropertyValue("FontDescriptor", fontDescriptor);
-			xLabelProps.setPropertyValue("Width", labelwidth);
-			xLabelProps.setPropertyValue("Height", (int) xLabelProps.getPropertyValue("Height") * 2);
-			xLabelProps.setPropertyValue("PositionX", dialogwidth-margin-labelwidth);
+			//xLabelProps.setPropertyValue("Width", labelwidth);
+			//xLabelProps.setPropertyValue("Height", (int) xLabelProps.getPropertyValue("Height") * 2);
+			//xLabelProps.setPropertyValue("PositionX", dialogwidth-margin-labelwidth);
 		} catch (Exception e) {
 			System.out.println("Oh no! Some property is wrong!");
 			e.printStackTrace(System.err);

@@ -57,7 +57,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		labelwidth		= dialogwidth - iconsize - (2*margin) - gap;
 		labelheight		= iconsize;
 		labelvertpos	= vmargin;
-		labelhorizpos	= margin + iconsize + gap/2;
+		labelhorizpos	= margin + iconsize; // + gap/2;
 		btnvertpos		= dialogheight - btnheight - margin; //labelvertpos + labelheight + gap/2 + btnheight;
 		
 		// Centered Buttons
