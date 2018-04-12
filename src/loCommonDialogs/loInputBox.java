@@ -146,6 +146,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 	}
 	
 	public short show(XModel xDoc, String title, String labeltext, String edittext, String rawhexPng) {
+/*		
 		XPropertySet xIconProps = null;
 		XGraphic 	 xGraphic	= null;
 		
@@ -168,17 +169,22 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 				// nop - there'll just be no custom icon
 			}
 		}
+*/
+
+		configIcon(guiIcon, rawhexPng);
 		
 		// Configure Inputbox Text to the current Application Font and at size 12pt and BOLD
 		//// Get Label XPropertySet interface
-		XControl xControl = UnoRuntime.queryInterface(XControl.class, guiLabel);
-		XControlModel xControlModel = xControl.getModel();
-		XPropertySet xLabelProps = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
-		
+		//XControl xControl = UnoRuntime.queryInterface(XControl.class, guiLabel);
+		//XControlModel xControlModel = xControl.getModel();
+		//XPropertySet xLabelProps = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
+		XPropertySet xLabelProps = getControlProps(guiLabel);
+				
 		//// Get FontDescriptor for Application Font
-		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
-		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
-		FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
+		//XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
+		//XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
+		//FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
+		FontDescriptor appFontDescriptor = getAppFontDescriptor(xDoc);
 		appFontDescriptor.Height = 10;
 		appFontDescriptor.Weight = FontWeight.BOLD;
 		

@@ -6,6 +6,7 @@ import java.awt.GraphicsEnvironment;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.xml.bind.DatatypeConverter;
 
 import com.sun.star.awt.FontDescriptor;
 import com.sun.star.awt.FontPitch;
@@ -26,6 +27,8 @@ import com.sun.star.awt.XFont;
 import com.sun.star.awt.XGraphics;
 import com.sun.star.awt.XLayoutConstrains;
 import com.sun.star.awt.XReschedule;
+import com.sun.star.awt.XStyleSettings;
+import com.sun.star.awt.XStyleSettingsSupplier;
 import com.sun.star.awt.XTextComponent;
 import com.sun.star.awt.XToolkit;
 import com.sun.star.awt.XUnitConversion;
@@ -511,5 +514,42 @@ public abstract class loDialogBox implements AutoCloseable {
 		while ( _xElementContainer.hasByName(_sElementName + Integer.toString(i)) )
 			++i;
 		return _sElementName + Integer.toString(i);
+	}
+	
+	protected void configIcon (XControl guiIcon, String rawhexPng) {
+		XPropertySet xIconProps = null;
+		XGraphic 	 xGraphic	= null;
+		
+		if ( rawhexPng != null ) {
+			byte[] hexbinaryIcon = DatatypeConverter.parseHexBinary(rawhexPng);
+			
+			// If getGraphic throws, just continue; the default icon will be used.
+			try {
+				xGraphic = getGraphic(hexbinaryIcon, "png");
+				
+				//// Get Label XPropertySet interface
+				//XControl xIconControl = UnoRuntime.queryInterface(XControl.class, guiIcon);
+				//XControlModel xIconControlModel = xIconControl.getModel();
+				//xIconProps = UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
+				xIconProps = getControlProps(guiIcon);
+				
+				if (xIconProps != null)
+					xIconProps.setPropertyValue("Graphic", xGraphic);				
+			} catch (Exception e) {
+				// nop - there'll just be no custom icon
+			}
+		}
+	}
+	
+	protected XPropertySet getControlProps (Object guiObject) {
+		XControl xControl = UnoRuntime.queryInterface(XControl.class, guiObject);
+		XControlModel xIconControlModel = xControl.getModel();
+		return UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
+	}
+	
+	protected FontDescriptor getAppFontDescriptor (XModel xDoc) {
+		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
+		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
+		return xStyleSettings.getApplicationFont();
 	}
 }

@@ -174,21 +174,25 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		
 		// Configure Warning Text to the current Application Font and at size 12pt and BOLD
 		//// Get Label XPropertySet interface
-		XControl xControl = UnoRuntime.queryInterface(XControl.class, guiLabel);
-		XControlModel xControlModel = xControl.getModel();
-		XPropertySet xLabelProps = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
+		//XControl xControl = UnoRuntime.queryInterface(XControl.class, guiLabel);
+		//XControlModel xControlModel = xControl.getModel();
+		//XPropertySet xLabelProps = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
+		XPropertySet xLabelProps = getControlProps(guiLabel);
 		
 		//// Get FontDescriptor for Application Font
-		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
-		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
-		FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
+		//XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
+		//XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
+		//FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
+		FontDescriptor appFontDescriptor = getAppFontDescriptor(xDoc);
 		appFontDescriptor.Height = 10;
-		appFontDescriptor.Weight = FontWeight.BOLD;		
+		appFontDescriptor.Weight = FontWeight.BOLD;
 		
-		xControl = UnoRuntime.queryInterface(XControl.class, guiLabel2);
-		xControlModel = xControl.getModel();
-		XPropertySet xLabel2Props = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
+		//xControl = UnoRuntime.queryInterface(XControl.class, guiLabel2);
+		//xControlModel = xControl.getModel();
+		//XPropertySet xLabel2Props = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
+		XPropertySet xLabel2Props = getControlProps(guiLabel2);
 		
+/*		
 		XPropertySet xIconProps = null;
 		XGraphic 	 xGraphic	= null;
 		
@@ -208,10 +212,12 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 				// nop - there'll just be no custom icon
 			}
 		}
+*/		
+		configIcon(guiIcon, rawhexPng);
 		
 		try {
-			if (xIconProps != null)
-				xIconProps.setPropertyValue("Graphic", xGraphic);
+//			if (xIconProps != null)
+//				xIconProps.setPropertyValue("Graphic", xGraphic);
 			
 			xLabelProps.setPropertyValue("Label", message);
 			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
