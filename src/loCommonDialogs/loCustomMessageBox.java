@@ -7,16 +7,11 @@ import com.sun.star.awt.FontWeight;
 import com.sun.star.awt.PushButtonType;
 import com.sun.star.awt.XButton;
 import com.sun.star.awt.XControl;
-import com.sun.star.awt.XControlModel;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
-import com.sun.star.awt.XStyleSettings;
-import com.sun.star.awt.XStyleSettingsSupplier;
 import com.sun.star.awt.XWindow;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XModel;
-import com.sun.star.graphic.XGraphic;
-import com.sun.star.report.XFixedLine;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
@@ -36,7 +31,6 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	// Dialog and Control Size & Position Values
 	private int labelvertpos, labelhorizpos;
 	private int btnvertpos, okbtnhpos, cancelbtnhpos;
-	private int lineVpos, lineHpos, linelength;
 	private int vmargin;
 	private int gap;
 	
@@ -57,8 +51,8 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		labelwidth		= dialogwidth - iconsize - (2*margin) - gap;
 		labelheight		= iconsize;
 		labelvertpos	= vmargin;
-		labelhorizpos	= margin + iconsize; // + gap/2;
-		btnvertpos		= dialogheight - btnheight - margin; //labelvertpos + labelheight + gap/2 + btnheight;
+		labelhorizpos	= margin + iconsize;
+		btnvertpos		= dialogheight - btnheight - margin;
 		
 		// Centered Buttons
 		okbtnhpos		= dialogwidth/2 - btnwidth - gap/2;
@@ -68,10 +62,6 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 //		okbtnhpos		= dialogwidth - margin - 2*btnwidth - gap;
 //		cancelbtnhpos	= dialogwidth - margin - btnwidth;		
 		
-		//cancelbtnhpos	= dialogwidth - btnwidth - margin;
-		lineVpos		= labelvertpos + labelheight; //vmargin + iconsize + vmargin;
-		lineHpos		= labelhorizpos; //margin;
-		linelength		= labelwidth; //dialogwidth - (2*margin);
 		initBox();
 	}
 	
@@ -92,17 +82,10 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			byte[] hexbinaryMessage = DatatypeConverter.parseHexBinary(rawhexMessage);
 			guiIcon = insertImage(margin, vmargin, iconsize, iconsize, hexbinaryMessage, "png");
 			
-			// Warning Icon (Default)
-			//String rawhexWarning = "89504E470D0A1A0A0000000D49484452000000300000003008060000005702F98700000006624B474400FF00FF00FFA0BDA793000000097048597300000B1300000B1301009A9C180000000774494D4507E2040210253784B9A8FA000003504944415468DEED583D6B1B41149C5984255418638C09214508526B42FA5B52A74A9D5F1852A6722D999426FD2D2684608231C6B8087721F8A5D0DE69F7BCF7A1FB100AD1C25923A3BB7B1FF366DF5B60BFF66BA797D86BB0C5818D1FFC5D6A888726B10600A446DF24717457E2D0EE3A30992FACB1724AF23835D1E5506956433D3889A3DF006DD879F62F39200040E200908CF8A3A168A486303E35D1939A4D8DC6104EA8DE8D8FF5751EF79C42B9133FFB76A2D70CA4467F02E5199D2D80BE7FA7691C7DDE590A89C87B800A229642CC8D17E1EA7DC4BB5D74C0528207B0152C923B05802073DC6B41777620892364854BA76E334C0B4424C7D93D7D38A13A721E93F9529E98221248103D9CC4D1F73E9C602FCA63F41F00239175E433EC46BE801F017C9CCC971FBAD8A17A509EBB6CA36A4A218B15D0BDA0473D749BC75EC8575F6EC7B3E549C1D11B00A72E9D481C0538B6150A65D4418836E3D9A2B4E04319717ECFAD512835FAB28C36A5D12AA1536AA2AFDBAC818C3A679EDA886C70BBAF4822386BAB48AD3290C4FA078091BB6179B87CA72E6E6A59D65462F4F53632605B657911A24D5B0A910405CFDB64416D6A7C12AF0A57449C4F1FD72A87E3698ED9AEE5569B156E7441D888D9663984EB0F29CAAF24D65F86C880D83F6F24FFC7BAD72FE24AD516AC3BD52096D79B6441352FDCE88AE074A51AE228480857F2A712939CA6467FEB2D03D91109C157A8A04D5F14B20178D9340BB50EE44724F49F381C8508AC36B75F7DF4425218C81DAA54E1F61472F0B4499FA4EA6533BAF763B80D0A594532FABE8E4AAAA6DFB9207914EA2386A550AE4847A9A99655964D5AE3D9427CEAB82D8F38B75763B2FB99EE78B6406A34435D2E9B731FC5516BCDD730FE05E04A206AA5603269EFC0B2D45E6E64BCD3BB64990861521EC6B3E56121AB0F000E830344035C3633B0C4F85B00276107EA2934992F4B0F013A0C80EE94C7D2224EE3E8BCCCF86DAB907FF12435FABC568584D44DA699EDA8908B01006FAB1CC87E3A959A31BAAE174A4CF418A0CFE3861B5968C89814F7057A9B96D160DDE6D75C850279EB67B9AAA49C08992687154D2824C531B9356DC2383591717BA1EC3533343AA469D20BF9B8136D0258D6B68AB2D1BF77B3CC8A943751215F91A4F78B99CD0521DFAFFDFA1FD75F34D243EF4CDF77560000000049454E44AE426082";
-			//byte[] hexbinaryWarning = DatatypeConverter.parseHexBinary(rawhexWarning);
-			//guiIcon = insertImage(margin, vmargin, iconsize, iconsize, hexbinaryWarning, "png");
-			
 			guiLabel 	 = insertFixedText(textalign_left, labelhorizpos, labelvertpos, labelwidth, labelheight, 0, "");
 			guiLabel2	 = insertFixedText(textalign_center, 0, labelvertpos + labelheight - 2, dialogwidth, btnheight/2 + btnheight/4, 0, "");
 			guiOKBtn 	 = insertButton(okbtnhpos, btnvertpos, btnwidth, btnheight, "OK", (short) PushButtonType.OK_value, true);
 			guiCancelBtn = insertButton(cancelbtnhpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, true);
-			
-			//XControl guiLine = (XControl) insertFixedLine(lineHpos, lineVpos, linelength, 1);
 		} catch (com.sun.star.uno.Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -113,6 +96,8 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	
 	/*
 	 * Implement dialog resizing on show, with accompanying control repositioning, in a future version...
+	 *
+	 * DON'T DELETE THIS!
 	 * 
 	public short show(XModel xDoc, String title, String message, String rawhexPng, int dlgWidth) {
 		return show(xDoc, title, message, rawhexPng, dlgWidth, dialogheight);
@@ -166,59 +151,24 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	}
 	
 	public short show(XModel xDoc, String title, String message, String subtext, String rawhexPng, boolean cancelbtn) {
-		// Use MessageBoxType.ERRORBOX for a System Error
-		// Use MessageBoxType.INFOBOX for a User Error
-		// Use MessageBoxType.WARNINGBOX for a Warning
+		// Use MessageBoxType.ERRORBOX for a System Error, MessageBoxType.INFOBOX for a User Error, or MessageBoxType.WARNINGBOX for a Warning
 		
 		configButtons(cancelbtn);
 		
 		// Configure Warning Text to the current Application Font and at size 12pt and BOLD
 		//// Get Label XPropertySet interface
-		//XControl xControl = UnoRuntime.queryInterface(XControl.class, guiLabel);
-		//XControlModel xControlModel = xControl.getModel();
-		//XPropertySet xLabelProps = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
 		XPropertySet xLabelProps = getControlProps(guiLabel);
 		
 		//// Get FontDescriptor for Application Font
-		//XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
-		//XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
-		//FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
 		FontDescriptor appFontDescriptor = getAppFontDescriptor(xDoc);
 		appFontDescriptor.Height = 10;
 		appFontDescriptor.Weight = FontWeight.BOLD;
 		
-		//xControl = UnoRuntime.queryInterface(XControl.class, guiLabel2);
-		//xControlModel = xControl.getModel();
-		//XPropertySet xLabel2Props = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
 		XPropertySet xLabel2Props = getControlProps(guiLabel2);
-		
-/*		
-		XPropertySet xIconProps = null;
-		XGraphic 	 xGraphic	= null;
-		
-		// Configure Icon
-		if ( rawhexPng != null ) {
-			byte[] hexbinaryIcon = DatatypeConverter.parseHexBinary(rawhexPng);
-			
-			// If getGraphic throws, just continue; the default icon will be used.
-			try {
-				xGraphic = getGraphic(hexbinaryIcon, "png");
-				
-				//// Get Label XPropertySet interface
-				XControl xIconControl = UnoRuntime.queryInterface(XControl.class, guiIcon);
-				XControlModel xIconControlModel = xIconControl.getModel();
-				xIconProps = UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
-			} catch (Exception e) {
-				// nop - there'll just be no custom icon
-			}
-		}
-*/		
+	
 		configIcon(guiIcon, rawhexPng);
 		
 		try {
-//			if (xIconProps != null)
-//				xIconProps.setPropertyValue("Graphic", xGraphic);
-			
 			xLabelProps.setPropertyValue("Label", message);
 			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
 			
