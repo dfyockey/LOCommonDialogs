@@ -1,38 +1,23 @@
 package loCommonDialogs;
 
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.GraphicsEnvironment;
-
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.xml.bind.DatatypeConverter;
 
 import com.sun.star.awt.FontDescriptor;
-import com.sun.star.awt.FontPitch;
-import com.sun.star.awt.FontSlant;
-import com.sun.star.awt.FontWeight;
 import com.sun.star.awt.ImageScaleMode;
 import com.sun.star.awt.Point;
 import com.sun.star.awt.Rectangle;
-import com.sun.star.awt.Size;
 import com.sun.star.awt.XButton;
 import com.sun.star.awt.XControl;
 import com.sun.star.awt.XControlContainer;
 import com.sun.star.awt.XControlModel;
-import com.sun.star.awt.XDevice;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
-import com.sun.star.awt.XFont;
-import com.sun.star.awt.XGraphics;
-import com.sun.star.awt.XLayoutConstrains;
 import com.sun.star.awt.XReschedule;
 import com.sun.star.awt.XStyleSettings;
 import com.sun.star.awt.XStyleSettingsSupplier;
 import com.sun.star.awt.XTextComponent;
 import com.sun.star.awt.XToolkit;
 import com.sun.star.awt.XUnitConversion;
-import com.sun.star.awt.XView;
 import com.sun.star.awt.XWindow;
 import com.sun.star.awt.XWindowPeer;
 import com.sun.star.beans.PropertyValue;
@@ -48,7 +33,6 @@ import com.sun.star.io.XOutputStream;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
-import com.sun.star.rendering.XTextLayout;
 import com.sun.star.style.VerticalAlignment;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
@@ -144,15 +128,6 @@ public abstract class loDialogBox implements AutoCloseable {
         Object oFTModel = m_xMSFDialogModel.createInstance(fullmodel);
         XMultiPropertySet xFTModelMPSet = UnoRuntime.queryInterface(XMultiPropertySet.class, oFTModel);
         
-        // FontDescriptor needs to go in HERE!!!
-        
-        //XPropertySet xFixedTextProps = UnoRuntime.queryInterface(XPropertySet.class, oFTModel);
-        //FontDescriptor fontDescriptor = (FontDescriptor) xFixedTextProps.getPropertyValue("FontDescriptor");
-        //fontDescriptor.Slant = FontSlant.ITALIC;
-        
-//        FontDescriptor fontDescriptor = initFont(oFTModel);
-        
-//        xFTModelMPSet.setPropertyValues(new String[]{"FontDescriptor", "Name"},new Object[]{fontDescriptor, sName});
         xFTModelMPSet.setPropertyValues(new String[]{"Name"},new Object[]{sName});
         
         // add the model to the NameContainer of the dialog model
@@ -163,104 +138,11 @@ public abstract class loDialogBox implements AutoCloseable {
 	
 	protected XFixedText insertFixedText(short _Align, int _nPosX, int _nPosY, int _nWidth, int _nHeight, int _nStep, String _sLabel) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Label", "com.sun.star.awt.UnoControlFixedTextModel");
-
-/*		
-
-		FontDescriptor fontDescriptor = (FontDescriptor) xMPSet.getPropertyValues(new String[] {"FontDescriptor"})[0];
-			fontDescriptor.Height = 26;
-			//fontDescriptor.Name = "Comfortaa Light";
-			//fontDescriptor.Pitch = FontPitch.FIXED;
-			//fontDescriptor.CharacterWidth = 150;
-			//fontDescriptor.Name = "Dialog";
-			//fontDescriptor.Name = "Liberation Serif";
-			fontDescriptor.Name = "Deja Vu Serif Condensed";
-			fontDescriptor.Weight = com.sun.star.awt.FontWeight.BOLD;
-*/
-
-/*
-		java.awt.Font awtFont = new java.awt.Font("Dialog", java.awt.Font.BOLD, 12);
-		
-		
-			JPanel awtFlowLayoutComponents = new JPanel();
-			java.awt.FlowLayout awtFlowLayout = new java.awt.FlowLayout();
-			awtFlowLayoutComponents.setLayout(awtFlowLayout);
-			java.awt.Label awtLabel = new java.awt.Label(_sLabel);
-			awtFlowLayoutComponents.add(awtLabel);
-			java.awt.Graphics awtGraphics = awtFlowLayoutComponents.getGraphics();
-		if (awtGraphics != null) {
-			java.awt.FontMetrics awtFontMetrics = awtGraphics.getFontMetrics(awtFont);
-			int txtHeight  = awtFontMetrics.getHeight();
-			int txtAdvance = awtFontMetrics.stringWidth(_sLabel);
-			_nHeight = txtHeight  + 2;
-			_nWidth  = txtAdvance + 2;
-		} else {
-			System.out.println("Oh no! It's NULL!");
-		}
-*/
-
-		//javafx.scene.text.Font defaultFont = javafx.scene.text.Font.getDefault();
-		
-		//java.awt.Font awtFont = new JLabel().getFont();
-		//System.out.println("awtFont size = " + awtFont.getSize());
-		
-		//int h = _nHeight * 2;
-			
-		//int bkColor = 16514043;	// #FBFBFB
-		
 		xMPSet.setPropertyValues(
-			//new String[] {"Align", "Border", "FontDescriptor", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "Width"},		// Remember: Alphabetical Order!
-			//new Object[] {_Align, (short)1, fontDescriptor, h, _sLabel, true, _nPosX, _nPosY, _nStep, _nWidth});
-		
-				
-				
-			//new String[] {"Align", "BackgroundColor", "Border", "Height", "Label", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
-			//new Object[] {_Align, bkColor, (short)0, _nHeight, _sLabel, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
-		
 			new String[] {"Align", "Border", "Height", "Label", "NoLabel", "MultiLine", "PositionX", "PositionY", "Step", "VerticalAlign", "Width"},		// Remember: Alphabetical Order!
 			new Object[] {_Align, (short)0, _nHeight, _sLabel, true, true, _nPosX, _nPosY, _nStep, VerticalAlignment.MIDDLE, _nWidth});
-
 		
 		XFixedText xFixedText = (XFixedText) _insertPostProc(XFixedText.class, xMPSet);
-		
-		/*
-		XView xView = UnoRuntime.queryInterface(XView.class, xFixedText);
-		XGraphics xGraphics = xView.getGraphics();
-		if (xGraphics == null)
-			System.out.println("Null! Bummer!");
-		*/
-		
-		/*
-		XTextLayout xTextLayout = UnoRuntime.queryInterface(XTextLayout.class, xDialog);
-		if (xTextLayout == null)
-			System.out.println("xTextLayout in null");
-		else
-			System.out.println("OMG! xTextLayout actually has a value!");
-		*/
-		
-		//FontDescriptor labelFontDescriptor = (FontDescriptor) (xMPSet.getPropertyValues(new String[] {"FontDescriptor"})[0]);
-		//System.out.println("Font Width = " + labelFontDescriptor.CharacterWidth);
-		
-//		XLayoutConstrains xLayoutConstrains = UnoRuntime.queryInterface(XLayoutConstrains.class, xFixedText);
-//		Size sizeLabel = xLayoutConstrains.getPreferredSize();
-		
-//		System.out.println("sizeLabel.Width = " + sizeLabel.Width);
-		
-		//int w = (int) (sizeLabel.Width * (12.0/10.0));
-//		int w = sizeLabel.Width;
-		/*
-		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, xContext);
-		Size sizePixels = m_xConversion.convertSizeToPixel(sizeLabel, MeasureUnit.APPFONT);
-		
-		System.out.println("sizePixels.Width = " + sizePixels.Width);
-		
-		Size sizeAppFont = m_xConversion.convertSizeToLogic(sizePixels, MeasureUnit.APPFONT);
-		
-		System.out.println("sizeAppFont.Width = " + sizeAppFont.Width);
-				*/
-//		xMPSet.setPropertyValues(new String[] {"Width"}, new Object[] {w});
-
-		
-		//return (XFixedText) _insertPostProc(XFixedText.class, xMPSet);
 		return xFixedText;
 	}
 	
@@ -296,8 +178,6 @@ public abstract class loDialogBox implements AutoCloseable {
 		short _mode = ImageScaleMode.NONE;
 		
 		XGraphic xGraphic = getGraphic(_ImageHexbinary, imgtype);
-		
-		//int borderColor = 16514043;	// #FBFBFB
 		
 		xMPSet.setPropertyValues(
 			new String[] {"Border", "Graphic", "Height", "PositionX", "PositionY", "ScaleMode", "Width"},	// Remember: Alphabetical Order!
@@ -379,16 +259,10 @@ public abstract class loDialogBox implements AutoCloseable {
 		
 		XInputStream xIStream = UnoRuntime.queryInterface(XInputStream.class, oPipe);
 		
-        //PropertyValue[] mediaProps = new PropertyValue[3];
         PropertyValue[] mediaProps = new PropertyValue[2];
         mediaProps[0] = new PropertyValue();
         mediaProps[0].Name = "InputStream";
         mediaProps[0].Value = xIStream;
-//        mediaProps[0].Name = "URL";
-//        mediaProps[0].Value = "file:///home/David/Pictures/Happy.jpg";        
-        //mediaProps[1] = new PropertyValue();
-        //mediaProps[1].Name = "OutputStream";
-        //mediaProps[1].Value = xOStream;
         mediaProps[1] = new PropertyValue();
         mediaProps[1].Name = "MimeType";
         mediaProps[1].Value = "image/" + imgtype;
@@ -398,23 +272,8 @@ public abstract class loDialogBox implements AutoCloseable {
 		XGraphicProvider xGraphicProvider = UnoRuntime.queryInterface(XGraphicProvider.class, oGraphicProvider);
 		
 		XGraphic xGraphic = xGraphicProvider.queryGraphic(mediaProps);
-
-		String xGP = (xGraphicProvider!=null)?"OK!":"NULL!";
-		String xG = (xGraphic!=null)?"OK!":"NULL!";
-		
-		System.out.println("xGraphicProvider " + xGP + "  " + "xGraphic " + xG);
 		
 		return xGraphic;
-	}
-	
-	private FontDescriptor initFont (Object oFTModel) throws com.sun.star.uno.Exception {		
-		XPropertySet xFixedTextProps = UnoRuntime.queryInterface(XPropertySet.class, oFTModel);
-		FontDescriptor fontDescriptor = (FontDescriptor) xFixedTextProps.getPropertyValue("FontDescriptor");
-		
-		fontDescriptor.Slant = FontSlant.ITALIC;
-		fontDescriptor.Height = 12;
-		
-		return fontDescriptor;
 	}
 	
 	protected void initialize(String[] PropertyNames, Object[] PropertyValues) {
@@ -447,53 +306,18 @@ public abstract class loDialogBox implements AutoCloseable {
 	protected void centerBox(XModel xDoc) {
 		XWindow loWindow = xDoc.getCurrentController().getFrame().getContainerWindow();
 		
-		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loWindow);
-		
-/*
-		XDevice xDevice = UnoRuntime.queryInterface(XDevice.class, loWindow);
-		
-
-		Point ptHeightPoints = new Point(26,26);
-		Point ptHeightPixels = m_xConversion.convertPointToPixel(ptHeightPoints, MeasureUnit.POINT);
-		System.out.println("Font height = " + ptHeightPixels.Y + " pixels.");
-		//ptHeightPixels.X += 2;
-		Point ptHeightDialog = m_xConversion.convertPointToLogic(ptHeightPixels, MeasureUnit.APPFONT);
-		System.out.println("Font height = " + ptHeightDialog.X + "," + ptHeightDialog.Y + " dialog units.");
-		
-		FontDescriptor fontDescriptor = new FontDescriptor();
-		fontDescriptor.Height = (short) (ptHeightDialog.Y);
-		fontDescriptor.Width  = (short) (ptHeightDialog.X);
-		//fontDescriptor.Name = "Liberation Serif";
-		fontDescriptor.Name = "Deja Vu Serif Condensed";
-		fontDescriptor.Weight = com.sun.star.awt.FontWeight.BOLD;
-		
-		XFont xFont = xDevice.getFont(fontDescriptor);
-
-//		long lStrWidth = xFont.getStringWidth("Insert child before or after the current child?");
-//		System.out.println("Insert child before or after the current child? = " + lStrWidth + " dialog units.");
-//		System.out.println("Char 'm' width = " + xFont.getCharWidth('m') + " dialog units.");
-
-		//String mmm = "mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm";
-		//long lStrWidth = xFont.getStringWidth(mmm);
-		//System.out.println(mmm + " = " + lStrWidth + " dialog units.");
-		//System.out.println("Char 'm' width = " + xFont.getCharWidth('m') + " dialog units.");
-*/
-		Rectangle loWindowRect = loWindow.getPosSize();
-		
-		Point ptWinSizePixels = new Point(loWindowRect.Width,loWindowRect.Height);
-		
-		// The following two lines of code, using XWindow loWindow, were inspired by code at
+		// The following line of code and the line below beginning 'Point ptWinSizeDialog = m_xConversion...',
+		// both using XWindow loWindow, were inspired by code at
 		// https://github.com/qt-haiku/LibreOffice/blob/master/toolkit/qa/complex/toolkit/UnitConversion.java
 		// where an XWindowPeer is used as the Object in the queryInterface call.
 		//
 		// These lines work great, but I've been unable to find where XWindowPeer or XWindow implementation
 		// or inheritance of the XUnitConversion interface is documented...
-//		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loWindow);
+		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loWindow);
+
+		Rectangle loWindowRect = loWindow.getPosSize();
 		
-		
-		//Point ptStrWidthPixels = new Point((int) lStrWidth, 0);
-		//Point ptStrWidthDialog = m_xConversion.convertPointToLogic(ptStrWidthPixels, MeasureUnit.APPFONT);
-		//System.out.println("Insert child before or after the current child? = " + ptStrWidthDialog.X + " dialog units.");
+		Point ptWinSizePixels = new Point(loWindowRect.Width,loWindowRect.Height);
 		
 		Point ptWinSizeDialog = m_xConversion.convertPointToLogic(ptWinSizePixels, MeasureUnit.APPFONT);
 		
@@ -528,9 +352,6 @@ public abstract class loDialogBox implements AutoCloseable {
 				xGraphic = getGraphic(hexbinaryIcon, "png");
 				
 				//// Get Label XPropertySet interface
-				//XControl xIconControl = UnoRuntime.queryInterface(XControl.class, guiIcon);
-				//XControlModel xIconControlModel = xIconControl.getModel();
-				//xIconProps = UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
 				xIconProps = getControlProps(guiIcon);
 				
 				if (xIconProps != null)
