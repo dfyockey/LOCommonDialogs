@@ -67,15 +67,11 @@ import com.sun.star.awt.FontWeight;
 import com.sun.star.awt.PushButtonType;
 import com.sun.star.awt.XButton;
 import com.sun.star.awt.XControl;
-import com.sun.star.awt.XControlModel;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
-import com.sun.star.awt.XStyleSettings;
-import com.sun.star.awt.XStyleSettingsSupplier;
 import com.sun.star.awt.XTextComponent;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XModel;
-import com.sun.star.graphic.XGraphic;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
@@ -85,16 +81,20 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 	protected int fieldvertpos;
 	protected int fieldhorizpos;
 	protected int btnvertpos;
-	protected int OKhorizpos;		//= dialogwidth/2 - btnwidth - gap/2; //margin + fieldwidth - 2*btnwidth - gap;
-	protected int Cancelhorizpos;	//= dialogwidth/2 + gap/2; //margin + fieldwidth - btnwidth;
+	protected int OKhorizpos;
+	protected int Cancelhorizpos;
 	protected int labelposX;
 	protected int labelposY;
 	
 	// Control Return Value Storage
 	private XFixedText		guiLabel;
 	private XTextComponent	guiEditBox;
+	
+	@SuppressWarnings("unused")
 	private XButton			guiOKBtn;
+	@SuppressWarnings("unused")
 	private XButton			guiCancelBtn;
+	
 	private XControl		guiIcon;
 	
 	public loInputBox(XComponentContext xComponentContext) {
@@ -116,8 +116,8 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		fieldhorizpos	= dialogwidth/2 - fieldwidth/2;
 		labelwidth		= dialogwidth - (2*margin) - iconsize - gap;
 		labelheight		= iconsize;
-		labelposX		= margin + iconsize; // + gap;
-		labelposY		= margin; // + iconsize/2 - labelheight/2;
+		labelposX		= margin + iconsize;
+		labelposY		= margin;
 		dialogheight	= btnvertpos + btnheight + margin;
 		dialogxpos  	= 0;
 		dialogypos  	= 0;
@@ -146,44 +146,15 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 	}
 	
 	public short show(XModel xDoc, String title, String labeltext, String edittext, String rawhexPng) {
-/*		
-		XPropertySet xIconProps = null;
-		XGraphic 	 xGraphic	= null;
-		
-		// Configure Icon
-		if ( rawhexPng != null ) {
-			byte[] hexbinaryIcon = DatatypeConverter.parseHexBinary(rawhexPng);
-			
-			// If getGraphic throws, just continue; the default icon will be used.
-			try {
-				xGraphic = getGraphic(hexbinaryIcon, "png");
-				
-				//// Get Label XPropertySet interface
-				XControl xIconControl = UnoRuntime.queryInterface(XControl.class, guiIcon);
-				XControlModel xIconControlModel = xIconControl.getModel();
-				xIconProps = UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
-				
-				if (xIconProps != null)
-					xIconProps.setPropertyValue("Graphic", xGraphic);				
-			} catch (Exception e) {
-				// nop - there'll just be no custom icon
-			}
-		}
-*/
+
 
 		configIcon(guiIcon, rawhexPng);
 		
 		// Configure Inputbox Text to the current Application Font and at size 12pt and BOLD
 		//// Get Label XPropertySet interface
-		//XControl xControl = UnoRuntime.queryInterface(XControl.class, guiLabel);
-		//XControlModel xControlModel = xControl.getModel();
-		//XPropertySet xLabelProps = UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
 		XPropertySet xLabelProps = getControlProps(guiLabel);
 				
 		//// Get FontDescriptor for Application Font
-		//XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
-		//XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
-		//FontDescriptor appFontDescriptor = xStyleSettings.getApplicationFont();
 		FontDescriptor appFontDescriptor = getAppFontDescriptor(xDoc);
 		appFontDescriptor.Height = 10;
 		appFontDescriptor.Weight = FontWeight.BOLD;
