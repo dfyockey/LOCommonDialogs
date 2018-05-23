@@ -1,5 +1,7 @@
 package loCommonDialogs;
 
+import java.util.logging.Level;
+
 // Title  : loMessageBox - Java class to display a messagebox in a LibreOffice document
 // Author : David Yockey
 // Email  : software@diffengine.net
@@ -84,6 +86,8 @@ import com.sun.star.awt.XWindowPeer;
 import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 
+import ngsqns.TKLogger;
+
 public class loMessageBox {
 	public short show(XModel xDoc, MessageBoxType messageBoxType, int messageBoxButtons, String messageBoxTitle, String message) {
 		try {
@@ -96,6 +100,7 @@ public class loMessageBox {
 			XMessageBox box = messageBoxFactory.createMessageBox(parentWindowPeer, messageBoxType, messageBoxButtons, messageBoxTitle, message);
 			return box.execute();
 		} catch (Exception e) {
+			TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 			return -1;
 		}
     }

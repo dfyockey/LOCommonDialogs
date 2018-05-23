@@ -1,5 +1,7 @@
 package loCommonDialogs;
 
+import java.util.logging.Level;
+
 import javax.xml.bind.DatatypeConverter;
 
 import com.sun.star.awt.FontDescriptor;
@@ -14,6 +16,8 @@ import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+
+import ngsqns.TKLogger;
 
 // Due to the current inability to match label width to text width and image control to icon size,
 // Centered Buttons, which deemphasize margin discrepancies, are preferred over Right-Justified buttons.
@@ -87,6 +91,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			guiOKBtn 	 = insertButton(okbtnhpos, btnvertpos, btnwidth, btnheight, "OK", (short) PushButtonType.OK_value, true);
 			guiCancelBtn = insertButton(cancelbtnhpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, true);
 		} catch (com.sun.star.uno.Exception e) {
+			TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 			e.printStackTrace(System.err);
 		}
 		
@@ -177,8 +182,9 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			xLabel2Props.setPropertyValue("Label", subtext);
 			xLabel2Props.setPropertyValue("FontDescriptor", appFontDescriptor);
 		} catch (Exception e) {
-			System.out.println("Oh no! Some property is wrong!");
+			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			e.printStackTrace(System.err);
+			// One or more fonts will just be wrong.
 		}
 		
 		return super.show(xDoc, title);
@@ -211,6 +217,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 				xCancelBtnWindow.setVisible(false);
 			}
 		} catch (Exception e) {
+			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			// nop - buttons will just be misplaced.
 		}
 	}	

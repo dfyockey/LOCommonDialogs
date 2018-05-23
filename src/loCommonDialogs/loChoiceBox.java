@@ -1,5 +1,7 @@
 package loCommonDialogs;
 
+import java.util.logging.Level;
+
 import javax.xml.bind.DatatypeConverter;
 
 import com.sun.star.awt.FontDescriptor;
@@ -14,6 +16,8 @@ import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+
+import ngsqns.TKLogger;
 
 public class loChoiceBox extends loDialogBox implements AutoCloseable {
 
@@ -98,6 +102,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, true);
 			
 		} catch (com.sun.star.uno.Exception e) {
+			TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 			e.printStackTrace(System.err);
 		}
 		
@@ -125,8 +130,9 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			// Config Label's font
 			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
 		} catch (Exception e) {
-			System.out.println("Oh no! Some property is wrong!");
+			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			e.printStackTrace(System.err);
+			// Font will just be wrong.
 		}
 		
 		btnclicked = 0;

@@ -5,5 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/LibreOffice Libraries [5.4]"/>
 	<classpathentry kind="lib" path="/usr/lib/jvm/openjfx/lib/jfxrt.jar"/>
 	<classpathentry kind="lib" path="/usr/lib/jvm/openjfx/lib/jfxswt.jar"/>
+	<classpathentry kind="lib" path="/ngsqnstk/src/ngsqns"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ngsqnstk"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
