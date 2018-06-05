@@ -318,14 +318,9 @@ public abstract class loDialogBox implements AutoCloseable {
 	
 	protected void centerBox(XModel xDoc) {
 		XWindow loWindow = xDoc.getCurrentController().getFrame().getContainerWindow();
-		
-		// The following line of code and the line below beginning 'Point ptWinSizeDialog = m_xConversion...',
-		// both using XWindow loWindow, were inspired by code at
-		// https://github.com/qt-haiku/LibreOffice/blob/master/toolkit/qa/complex/toolkit/UnitConversion.java
-		// where an XWindowPeer is used as the Object in the queryInterface call.
-		//
-		// These lines work great, but I've been unable to find where XWindowPeer or XWindow implementation
-		// or inheritance of the XUnitConversion interface is documented...
+
+		// XUnitConversion is provided by the window component referred to by XWindow (i.e. the 'ContainerWindow')
+		// as evidenced by examination of information in the well-known MRI Object Inspection Tool.
 		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loWindow);
 
 		Rectangle loWindowRect = loWindow.getPosSize();
