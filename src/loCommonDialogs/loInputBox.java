@@ -180,6 +180,10 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 	public String gettext() {
 		return guiEditBox.getText();
 	}
+	
+	public void settext(String s) {
+		guiEditBox.setText(s);
+	}
 
 	public void close() {
 		// Dispose the component and free the memory...
