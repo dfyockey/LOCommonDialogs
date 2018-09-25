@@ -40,7 +40,7 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.MeasureUnit;
 
-import ngsqns.TKLogger;
+import tkutils.TKLogger;
 
 // Note : Consequences of Level.SEVERE problems are expected to later cause an exception elsewhere
 //        (e.g. a NullPointerException) which should be caught and handled by the dialog caller.

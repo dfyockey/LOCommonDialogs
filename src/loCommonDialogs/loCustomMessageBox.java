@@ -17,7 +17,7 @@ import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-import ngsqns.TKLogger;
+import tkutils.TKLogger;
 
 // Due to the current inability to match label width to text width and image control to icon size,
 // Centered Buttons, which deemphasize margin discrepancies, are preferred over Right-Justified buttons.

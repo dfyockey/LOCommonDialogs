@@ -86,7 +86,7 @@ import com.sun.star.awt.XWindowPeer;
 import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 
-import ngsqns.TKLogger;
+import tkutils.TKLogger;
 
 public class loMessageBox {
 	public short show(XModel xDoc, MessageBoxType messageBoxType, int messageBoxButtons, String messageBoxTitle, String message) {

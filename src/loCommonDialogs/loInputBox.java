@@ -77,7 +77,7 @@ import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-import ngsqns.TKLogger;
+import tkutils.TKLogger;
 
 public class loInputBox extends loDialogBox implements AutoCloseable {
 		
