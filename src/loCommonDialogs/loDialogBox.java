@@ -219,7 +219,6 @@ public abstract class loDialogBox implements AutoCloseable {
 	        catch( Exception e) {
 	        	TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 	            e.printStackTrace(System.err);
-	            System.exit(1);
 	        }
         }
         return xContext;
