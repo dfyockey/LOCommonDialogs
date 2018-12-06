@@ -56,7 +56,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		Btn1horizpos	= Btn2horizpos + (btnwidth + gap);
 		Cancelhorizpos	= Btn1horizpos + (btnwidth + gap);
 		
-		dialogheight	= margin + iconsize + btnheight + margin;
+		dialogheight	= margin + iconsize + btnheight + margin + 3;	// 3 is a fudge factor
 		
 		initBox();
 	}

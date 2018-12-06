@@ -51,12 +51,12 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		vmargin			= margin;		// Amount to offset everything from the top
 		iconsize		= 32;
 		dialogwidth		= 175;
-		dialogheight	= 65;
+		dialogheight	= 68;	// Increased from 65 to 68 as a fudge factor
 		labelwidth		= dialogwidth - iconsize - (2*margin) - gap;
 		labelheight		= iconsize;
 		labelvertpos	= vmargin;
 		labelhorizpos	= margin + iconsize;
-		btnvertpos		= dialogheight - btnheight - margin;
+		btnvertpos		= dialogheight - btnheight - margin - 3;	// 3 is a fudge factor
 		
 		// Centered Buttons
 		okbtnhpos		= dialogwidth/2 - btnwidth - gap/2;

@@ -122,7 +122,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		labelheight		= iconsize;
 		labelposX		= margin + iconsize;
 		labelposY		= margin;
-		dialogheight	= btnvertpos + btnheight + margin;
+		dialogheight	= btnvertpos + btnheight + margin + 3;	// 3 is a fudge factor
 		dialogxpos  	= 0;
 		dialogypos  	= 0;
 		
