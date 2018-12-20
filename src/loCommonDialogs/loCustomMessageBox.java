@@ -40,7 +40,6 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	
 	// Control Instance Storage
 	private XFixedText	guiLabel;
-	private XFixedText	guiLabel2;
 	private XButton		guiOKBtn;
 	private XButton		guiCancelBtn;
 	private XControl	guiIcon;
@@ -51,12 +50,14 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		vmargin			= margin;		// Amount to offset everything from the top
 		iconsize		= 32;
 		dialogwidth		= 175;
-		dialogheight	= 68;	// Increased from 65 to 68 as a fudge factor
 		labelwidth		= dialogwidth - iconsize - (2*margin) - gap;
 		labelheight		= iconsize;
 		labelvertpos	= vmargin;
 		labelhorizpos	= margin + iconsize;
-		btnvertpos		= dialogheight - btnheight - margin - 3;	// 3 is a fudge factor
+		//btnvertpos		= dialogheight - btnheight - margin - 3;	// 3 is a fudge factor
+		btnvertpos		= vmargin + labelheight;
+		
+		dialogheight	= vmargin + labelheight + labelborderwidth*2 + btnheight + 2 + vmargin;	// 2 = button border width?
 		
 		// Centered Buttons
 		okbtnhpos		= dialogwidth/2 - btnwidth - gap/2;
@@ -87,7 +88,6 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			guiIcon = insertImage(margin, vmargin, iconsize, iconsize, hexbinaryMessage, "png");
 			
 			guiLabel 	 = insertFixedText(textalign_left, labelhorizpos, labelvertpos, labelwidth, labelheight, 0, "");
-			guiLabel2	 = insertFixedText(textalign_center, 0, labelvertpos + labelheight - 2, dialogwidth, btnheight/2 + btnheight/4, 0, "");
 			guiOKBtn 	 = insertButton(okbtnhpos, btnvertpos, btnwidth, btnheight, "OK", (short) PushButtonType.OK_value, true);
 			guiCancelBtn = insertButton(cancelbtnhpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, true);
 		} catch (com.sun.star.uno.Exception e) {
@@ -158,6 +158,10 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	public short show(XModel xDoc, String title, String message, String subtext, String rawhexPng, boolean cancelbtn) {
 		// Use MessageBoxType.ERRORBOX for a System Error, MessageBoxType.INFOBOX for a User Error, or MessageBoxType.WARNINGBOX for a Warning
 		
+		// NOTE: Since guiLabel2 has been removed from the dialog, String subtext is ignored.
+		//       The argument is retained for compatibility with existing method calls,
+		//       but should be removed in a future version.
+		
 		configButtons(cancelbtn);
 		
 		// Configure Warning Text to the current Application Font and at size 12pt and BOLD
@@ -169,18 +173,15 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		appFontDescriptor.Height = 10;
 		appFontDescriptor.Weight = FontWeight.BOLD;
 		
-		XPropertySet xLabel2Props = getControlProps(guiLabel2);
-	
 		configIcon(guiIcon, rawhexPng);
 		
 		try {
 			xLabelProps.setPropertyValue("Label", message);
 			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
 			
-			appFontDescriptor.Height = 10;
-			appFontDescriptor.Weight = FontWeight.NORMAL;
-			xLabel2Props.setPropertyValue("Label", subtext);
-			xLabel2Props.setPropertyValue("FontDescriptor", appFontDescriptor);
+//			appFontDescriptor.Height = 10;
+//			appFontDescriptor.Weight = FontWeight.NORMAL;
+			
 		} catch (Exception e) {
 			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			e.printStackTrace(System.err);
