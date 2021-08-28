@@ -40,7 +40,7 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 import com.sun.star.util.MeasureUnit;
 
-import tkutils.TKLogger;
+import dlgutils.DlgLogger;
 
 // Note : Consequences of Level.SEVERE problems are expected to later cause an exception elsewhere
 //        (e.g. a NullPointerException) which should be caught and handled by the dialog caller.
@@ -217,7 +217,7 @@ public abstract class loDialogBox implements AutoCloseable {
 	                System.out.println("Connected to a running office ...");
 	        }
 	        catch( Exception e) {
-	        	TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
+	        	DlgLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 	            e.printStackTrace(System.err);
 	        }
         }
@@ -249,7 +249,7 @@ public abstract class loDialogBox implements AutoCloseable {
 			
 			//initFixedText(_xMCF, _xContext);
 		} catch (Exception e) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 			e.printStackTrace(System.err);
 		}
 	}
@@ -287,7 +287,7 @@ public abstract class loDialogBox implements AutoCloseable {
 			XMultiPropertySet xMultiPropertySet = UnoRuntime.queryInterface(XMultiPropertySet.class, m_xDlgModelNameContainer);
 			xMultiPropertySet.setPropertyValues(PropertyNames, PropertyValues);
 		} catch (com.sun.star.uno.Exception ex) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, ex);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, ex);
 			ex.printStackTrace(System.err);
 			// nop - Dialog miscellany such as size, position, name, etc will just be wrong.
 		}
@@ -307,7 +307,7 @@ public abstract class loDialogBox implements AutoCloseable {
 				
 				m_xWindowPeer = m_xDialogControl.getPeer();
 			} catch( Exception e) {
-				TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
+				DlgLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 				e.printStackTrace(System.err);
 				return null;
 			}
@@ -336,7 +336,7 @@ public abstract class loDialogBox implements AutoCloseable {
 		try {
 			xMPSet.setPropertyValues( new String[]{"PositionX", "PositionY"},new Object[]{dialogxpos, dialogypos});
 		} catch (Exception e) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			// nop - Dialog will be positioned at position 0,0 or wherever it was previously.
 		}
 	}
@@ -365,7 +365,7 @@ public abstract class loDialogBox implements AutoCloseable {
 				if (xIconProps != null)
 					xIconProps.setPropertyValue("Graphic", xGraphic);				
 			} catch (Exception e) {
-				TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+				DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 				// nop - There'll just be no custom icon.
 			}
 		}

@@ -77,7 +77,7 @@ import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-import tkutils.TKLogger;
+import dlgutils.DlgLogger;
 
 public class loInputBox extends loDialogBox implements AutoCloseable {
 		
@@ -142,7 +142,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 			guiOKBtn	 = insertButton(OKhorizpos,     btnvertpos, btnwidth, btnheight, "OK",     (short) PushButtonType.OK_value,		true );
 			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, false);
 		} catch (com.sun.star.uno.Exception e) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 			e.printStackTrace(System.err);
 		}
 		
@@ -167,7 +167,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		try {
 			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
 		} catch (Exception e) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			// nop - text just won't be bold
 		}
 		

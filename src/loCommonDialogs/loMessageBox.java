@@ -86,7 +86,7 @@ import com.sun.star.awt.XWindowPeer;
 import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 
-import tkutils.TKLogger;
+import dlgutils.DlgLogger;
 
 public class loMessageBox {
 	public short show(XModel xDoc, MessageBoxType messageBoxType, int messageBoxButtons, String messageBoxTitle, String message) {
@@ -100,7 +100,7 @@ public class loMessageBox {
 			XMessageBox box = messageBoxFactory.createMessageBox(parentWindowPeer, messageBoxType, messageBoxButtons, messageBoxTitle, message);
 			return box.execute();
 		} catch (Exception e) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 			return -1;
 		}
     }

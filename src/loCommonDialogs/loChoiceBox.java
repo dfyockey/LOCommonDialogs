@@ -17,7 +17,7 @@ import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
-import tkutils.TKLogger;
+import dlgutils.DlgLogger;
 
 public class loChoiceBox extends loDialogBox implements AutoCloseable {
 
@@ -78,9 +78,13 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			guiLabel = insertFixedText(align_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
 
 			// Default icon should be a Question Mark... Fix later...
+//COMMENT OUT the next three lines to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
 			String rawhexChoice = "";
 			byte[] hexbinaryChoice = DatatypeConverter.parseHexBinary(rawhexChoice);
 			guiIcon = insertImage(margin, margin, iconsize, iconsize, hexbinaryChoice, "jpg");
+			
+//UNCOMMENT the next line to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
+			//guiIcon = insertImage(margin, margin, iconsize, iconsize, "vnd.sun.star.extension://net.diffengine.nnoutline.nnoutline/images/Child_26x26.png");
 			
 			
 			//// In the following, return values from com.sun.star.awt.MessageBoxResults are used for choice buttons
@@ -102,7 +106,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			guiCancelBtn = insertButton(Cancelhorizpos, btnvertpos, btnwidth, btnheight, "Cancel", (short) PushButtonType.CANCEL_value, true);
 			
 		} catch (com.sun.star.uno.Exception e) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.SEVERE, e);
 			e.printStackTrace(System.err);
 		}
 		
@@ -112,6 +116,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 	
 	public short show(XModel xDoc, String title, String labeltext, String btnlabel2, String btnlabel1, String rawhexPng) {
 		
+//COMMENT OUT to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
 		configIcon(guiIcon, rawhexPng);
 		
 		guiLabel.setText(labeltext);
@@ -130,7 +135,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			// Config Label's font
 			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
 		} catch (Exception e) {
-			TKLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			e.printStackTrace(System.err);
 			// Font will just be wrong.
 		}
