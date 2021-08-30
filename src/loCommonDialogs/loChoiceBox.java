@@ -1,5 +1,6 @@
 package loCommonDialogs;
 
+import java.net.URL;
 import java.util.logging.Level;
 
 import javax.xml.bind.DatatypeConverter;
@@ -79,13 +80,18 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 
 			// Default icon should be a Question Mark... Fix later...
 //COMMENT OUT the next three lines to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
-			String rawhexChoice = "";
-			byte[] hexbinaryChoice = DatatypeConverter.parseHexBinary(rawhexChoice);
-			guiIcon = insertImage(margin, margin, iconsize, iconsize, hexbinaryChoice, "jpg");
+//			String rawhexChoice = "";
+//			byte[] hexbinaryChoice = DatatypeConverter.parseHexBinary(rawhexChoice);
+//			guiIcon = insertImage(margin, margin, iconsize, iconsize, hexbinaryChoice, "jpg");
 			
 //UNCOMMENT the next line to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
 			//guiIcon = insertImage(margin, margin, iconsize, iconsize, "vnd.sun.star.extension://net.diffengine.nnoutline.nnoutline/images/Child_26x26.png");
 			
+			// Get an iconNone URL
+				URL url = this.getClass().getResource("/images/none.png");
+				String iconNone = url.toString();
+				
+			guiIcon = insertImage(margin, margin, iconsize, iconsize, iconNone);	// The last arg should be a default image URL that's relative to the project...
 			
 			//// In the following, return values from com.sun.star.awt.MessageBoxResults are used for choice buttons
 			//// to make loChoiceBox a drop-in replacement for a XMessageBox-based Yes/No/Cancel messagebox.
@@ -114,10 +120,12 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
 	
-	public short show(XModel xDoc, String title, String labeltext, String btnlabel2, String btnlabel1, String rawhexPng) {
+	public short show(XModel xDoc, String title, String labeltext, String btnlabel2, String btnlabel1, String ImageUrl) {
 		
 //COMMENT OUT to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
-		configIcon(guiIcon, rawhexPng);
+		//configIcon(guiIcon, rawhexPng);
+		if (ImageUrl != "")
+			configIcon(guiIcon, ImageUrl);
 		
 		guiLabel.setText(labeltext);
 		guiChoiceBtn2.setLabel(btnlabel2);

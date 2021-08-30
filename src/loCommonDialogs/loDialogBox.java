@@ -282,6 +282,27 @@ public abstract class loDialogBox implements AutoCloseable {
 		return xGraphic;
 	}
 	
+	  // creates a UNO graphic object that can be used to be assigned 
+	  // to the property "Graphic" of a controlmodel
+	  // (from https://wiki.openoffice.org/wiki/Documentation/DevGuide/GUI/Command_Button) 
+	  public XGraphic getGraphic(String ImageUrl){
+	  XGraphic xGraphic = null;
+	  try{
+	      // create a GraphicProvider at the global service manager...
+	      Object oGraphicProvider = xMCF.createInstanceWithContext("com.sun.star.graphic.GraphicProvider", xContext);
+	      XGraphicProvider xGraphicProvider = (XGraphicProvider) UnoRuntime.queryInterface(XGraphicProvider.class, oGraphicProvider);
+	      // create the graphic object
+	      PropertyValue[] aPropertyValues = new PropertyValue[1];
+	      PropertyValue aPropertyValue = new PropertyValue();
+	      aPropertyValue.Name = "URL";
+	      aPropertyValue.Value = ImageUrl;
+	      aPropertyValues[0] = aPropertyValue;
+	      xGraphic = xGraphicProvider.queryGraphic(aPropertyValues);
+	      return xGraphic;
+	  }catch (com.sun.star.uno.Exception ex){
+	      throw new java.lang.RuntimeException("cannot happen...");
+	  }}
+	
 	protected void initialize(String[] PropertyNames, Object[] PropertyValues) {
 		try {
 			XMultiPropertySet xMultiPropertySet = UnoRuntime.queryInterface(XMultiPropertySet.class, m_xDlgModelNameContainer);
@@ -348,7 +369,7 @@ public abstract class loDialogBox implements AutoCloseable {
 		return _sElementName + Integer.toString(i);
 	}
 	
-	protected void configIcon (XControl guiIcon, String rawhexPng) {
+	protected void configIconFromHexBinary (XControl guiIcon, String rawhexPng) {
 		XPropertySet xIconProps = null;
 		XGraphic 	 xGraphic	= null;
 		
@@ -358,6 +379,28 @@ public abstract class loDialogBox implements AutoCloseable {
 			// If getGraphic throws, just continue; the default icon will be used.
 			try {
 				xGraphic = getGraphic(hexbinaryIcon, "png");
+				
+				//// Get Label XPropertySet interface
+				xIconProps = getControlProps(guiIcon);
+				
+				if (xIconProps != null)
+					xIconProps.setPropertyValue("Graphic", xGraphic);				
+			} catch (Exception e) {
+				DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+				// nop - There'll just be no custom icon.
+			}
+		}
+	}
+	
+	protected void configIcon (XControl guiIcon, String ImageUrl) {
+		XPropertySet xIconProps = null;
+		XGraphic 	 xGraphic	= null;
+		
+		if ( ImageUrl != null ) {
+			
+			// If getGraphic throws, just continue; the default icon will be used.
+			try {
+				xGraphic = getGraphic(ImageUrl);
 				
 				//// Get Label XPropertySet interface
 				xIconProps = getControlProps(guiIcon);
