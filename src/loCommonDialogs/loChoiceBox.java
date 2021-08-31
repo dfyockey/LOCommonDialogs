@@ -78,22 +78,8 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			//short align_right = 2;
 			guiLabel = insertFixedText(align_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
 
-			// Default icon should be a Question Mark... Fix later...
-//COMMENT OUT the next three lines to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
-//			String rawhexChoice = "";
-//			byte[] hexbinaryChoice = DatatypeConverter.parseHexBinary(rawhexChoice);
-//			guiIcon = insertImage(margin, margin, iconsize, iconsize, hexbinaryChoice, "jpg");
-			
-//UNCOMMENT the next line to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
-			//guiIcon = insertImage(margin, margin, iconsize, iconsize, "vnd.sun.star.extension://net.diffengine.nnoutline.nnoutline/images/Child_26x26.png");
-			
-			// Get an iconNone URL
-				//URL url = this.getClass().getResource("/images/none.png");
-				//String iconNone = url.toString();
-			
 			String iconNone = "";
-				
-			guiIcon = insertImage(margin, margin, iconsize, iconsize, iconNone);	// The last arg should be a default image URL that's relative to the project...
+			guiIcon = insertImage(margin, margin, iconsize, iconsize, iconNone);
 			
 			//// In the following, return values from com.sun.star.awt.MessageBoxResults are used for choice buttons
 			//// to make loChoiceBox a drop-in replacement for a XMessageBox-based Yes/No/Cancel messagebox.
@@ -123,9 +109,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 	}
 	
 	public short show(XModel xDoc, String title, String labeltext, String btnlabel2, String btnlabel1, String ImageUrl) {
-		
-//COMMENT OUT to test using a URL to an image file rather than a lexical representation of xsd:hexBinary
-		//configIcon(guiIcon, rawhexPng);
+
 		if (ImageUrl != "")
 			configIcon(guiIcon, ImageUrl);
 		
