@@ -88,8 +88,10 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			//guiIcon = insertImage(margin, margin, iconsize, iconsize, "vnd.sun.star.extension://net.diffengine.nnoutline.nnoutline/images/Child_26x26.png");
 			
 			// Get an iconNone URL
-				URL url = this.getClass().getResource("/images/none.png");
-				String iconNone = url.toString();
+				//URL url = this.getClass().getResource("/images/none.png");
+				//String iconNone = url.toString();
+			
+			String iconNone = "";
 				
 			guiIcon = insertImage(margin, margin, iconsize, iconsize, iconNone);	// The last arg should be a default image URL that's relative to the project...
 			
