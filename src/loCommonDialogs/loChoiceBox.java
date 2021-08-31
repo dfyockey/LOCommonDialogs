@@ -1,9 +1,6 @@
 package loCommonDialogs;
 
-import java.net.URL;
 import java.util.logging.Level;
-
-import javax.xml.bind.DatatypeConverter;
 
 import com.sun.star.awt.FontDescriptor;
 import com.sun.star.awt.FontWeight;
@@ -73,10 +70,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		
 		// add dialog controls
 		try {
-			//short align_left = 0;
-			short align_center = 1;
-			//short align_right = 2;
-			guiLabel = insertFixedText(align_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
+			guiLabel = insertFixedText(loDialogBox.textalign_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
 
 			String iconNone = "";
 			guiIcon = insertImage(margin, margin, iconsize, iconsize, iconNone);
