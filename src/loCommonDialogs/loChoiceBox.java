@@ -146,11 +146,4 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			xDialog.endExecute();
 		}
 	};
-	
-	public void close() {
-		// Dispose the component and free the memory...
-        if (m_xComponent != null){
-            m_xComponent.dispose();
-        }
-	}
 }

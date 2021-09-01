@@ -114,6 +114,7 @@ public abstract class loDialogBox implements AutoCloseable {
 	    return xDialog.execute();
 	}
 	
+	// To avoid memory leaks, close must be called (i.e. as `super.close()`) at the end of any overriding close method in a derived class
 	public void close() {
 		// Dispose the component and free the memory...
         if (m_xComponent != null){
