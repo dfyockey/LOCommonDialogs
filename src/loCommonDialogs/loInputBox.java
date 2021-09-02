@@ -110,7 +110,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		xMCF = xContext.getServiceManager();
 		createDialog(xMCF, xContext);
 		
-		iconsize		= 32;
+		iconsize		= 30;
 		dialogwidth		= 200;
 		OKhorizpos		= dialogwidth/2 - btnwidth - gap/2;
 		Cancelhorizpos	= dialogwidth/2 + gap/2;

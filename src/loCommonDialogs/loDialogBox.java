@@ -171,7 +171,7 @@ public abstract class loDialogBox implements AutoCloseable {
 	// URL-based Image
 	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, String _ImageURL) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
-		short _mode = ImageScaleMode.NONE;
+		short _mode = ImageScaleMode.ISOTROPIC;
 		xMPSet.setPropertyValues(
 			new String[] {"Border", "Height", "ImageURL", "PositionX", "PositionY", "ScaleMode", "Width"},	// Remember: Alphabetical Order!
 			new Object[] {(short)0, _nHeight, _ImageURL, _nPosX, _nPosY, _mode, _nWidth});

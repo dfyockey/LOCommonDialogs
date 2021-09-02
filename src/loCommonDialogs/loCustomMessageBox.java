@@ -48,7 +48,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		super(xComponentContext);
 		gap				= margin;
 		vmargin			= margin;		// Amount to offset everything from the top
-		iconsize		= 32;
+		iconsize		= 30;
 		dialogwidth		= 175;
 		labelwidth		= dialogwidth - iconsize - (2*margin) - gap;
 		labelheight		= iconsize;

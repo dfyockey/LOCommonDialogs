@@ -40,7 +40,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 	public loChoiceBox(XComponentContext xComponentContext) {
 		// w = dialog width, h = dialog height, 0 for either = minimum value
 		super(xComponentContext);
-		iconsize		= 32;
+		iconsize		= 30;
 		
 		dialogwidth		= 235;
 		
