@@ -1,7 +1,12 @@
 package loCommonDialogs;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.logging.Level;
 
+import javax.imageio.ImageIO;
 import javax.xml.bind.DatatypeConverter;
 
 import com.sun.star.awt.FontDescriptor;
@@ -30,6 +35,8 @@ import com.sun.star.container.XNameContainer;
 import com.sun.star.frame.XModel;
 import com.sun.star.graphic.XGraphic;
 import com.sun.star.graphic.XGraphicProvider;
+import com.sun.star.io.BufferSizeExceededException;
+import com.sun.star.io.NotConnectedException;
 import com.sun.star.io.XInputStream;
 import com.sun.star.io.XOutputStream;
 import com.sun.star.lang.XComponent;
@@ -283,6 +290,90 @@ public abstract class loDialogBox implements AutoCloseable {
 		return xGraphic;
 	}
 	
+	private InputStream getImgStream(String fileName) {
+	    return getClass().getResourceAsStream(fileName);
+	}
+	
+	public class ImgStream implements XInputStream {
+		private InputStream javaInputStream;
+		
+		public ImgStream (String fileName) {
+			javaInputStream = getClass().getResourceAsStream(fileName);
+		}
+		
+		public int available () {
+			try {
+				return javaInputStream.available();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return 0;
+		}
+		
+		public void closeInput () {
+			try {
+				javaInputStream.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		public int readBytes (byte[][] aData, int nBytesToRead) {
+			try {
+				return javaInputStream.read(aData[1], 0, nBytesToRead);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return -1;
+		}
+		
+		public int readSomeBytes (byte[][] aData, int nMaxBytesToRead) {
+			try {
+				return javaInputStream.read(aData[1], 0, nMaxBytesToRead);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return -1;
+		}
+		
+		public void skipBytes (int nBytesToSkip) {
+			try {
+				javaInputStream.skip(nBytesToSkip);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}		
+	}
+	
+	protected XGraphic getGraphic(URL imgURL, String imgtype) throws com.sun.star.uno.Exception {
+		
+		//ImgStream imgStream = new ImgStream(imgURL.toString());
+		ImgStream imgStream = new ImgStream("/images/message.png");
+		
+		XInputStream xIStream = UnoRuntime.queryInterface(XInputStream.class, imgStream);
+		
+        PropertyValue[] mediaProps = new PropertyValue[2];
+        mediaProps[0] = new PropertyValue();
+        mediaProps[0].Name = "InputStream";
+        mediaProps[0].Value = xIStream;
+        mediaProps[1] = new PropertyValue();
+        mediaProps[1].Name = "MimeType";
+        mediaProps[1].Value = "image/" + imgtype;
+	
+		// Instantiate a GraphicProvider
+		Object oGraphicProvider = xMCF.createInstanceWithContext("com.sun.star.graphic.GraphicProvider", xContext);
+		XGraphicProvider xGraphicProvider = UnoRuntime.queryInterface(XGraphicProvider.class, oGraphicProvider);
+		
+		XGraphic xGraphic = xGraphicProvider.queryGraphic(mediaProps);
+		
+		return xGraphic;
+	}
+	
 	  // creates a UNO graphic object that can be used to be assigned 
 	  // to the property "Graphic" of a controlmodel
 	  // (from https://wiki.openoffice.org/wiki/Documentation/DevGuide/GUI/Command_Button) 
@@ -380,6 +471,28 @@ public abstract class loDialogBox implements AutoCloseable {
 			// If getGraphic throws, just continue; the default icon will be used.
 			try {
 				xGraphic = getGraphic(hexbinaryIcon, "png");
+				
+				//// Get Label XPropertySet interface
+				xIconProps = getControlProps(guiIcon);
+				
+				if (xIconProps != null)
+					xIconProps.setPropertyValue("Graphic", xGraphic);				
+			} catch (Exception e) {
+				DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+				// nop - There'll just be no custom icon.
+			}
+		}
+	}
+
+	protected void configIcon (XControl guiIcon, URL imgUrl) {
+		XPropertySet xIconProps = null;
+		XGraphic 	 xGraphic	= null;
+		
+		if ( imgUrl != null ) {
+			
+			// If getGraphic throws, just continue; the default icon will be used.
+			try {
+				xGraphic = getGraphic(imgUrl, "png");
 				
 				//// Get Label XPropertySet interface
 				xIconProps = getControlProps(guiIcon);
