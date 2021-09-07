@@ -4,22 +4,24 @@ import java.util.logging.Level;
 
 import com.sun.star.awt.FontDescriptor;
 import com.sun.star.awt.FontWeight;
+import com.sun.star.awt.Point;
 import com.sun.star.awt.PushButtonType;
 import com.sun.star.awt.XButton;
 import com.sun.star.awt.XControl;
+import com.sun.star.awt.XControlModel;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
+import com.sun.star.awt.XLayoutConstrains;
+import com.sun.star.awt.XUnitConversion;
 import com.sun.star.awt.XWindow;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.frame.XModel;
 import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
+import com.sun.star.util.MeasureUnit;
 
 import dlgutils.DlgLogger;
 import dlgutils.ImageProc;
-
-// Due to the current inability to match label width to text width and image control to icon size,
-// Centered Buttons, which deemphasize margin discrepancies, are preferred over Right-Justified buttons.
 
 public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	
@@ -59,12 +61,12 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		dialogheight	= vmargin + labelheight + labelborderwidth*2 + btnheight + 2 + vmargin;	// 2 = button border width?
 		
 		// Centered Buttons
-		okbtnhpos		= dialogwidth/2 - btnwidth - gap/2;
-		cancelbtnhpos	= dialogwidth/2 + gap/2;
+//		okbtnhpos		= dialogwidth/2 - btnwidth - gap/2;
+//		cancelbtnhpos	= dialogwidth/2 + gap/2;
 		
 		// Right-Justified Buttons
-//		okbtnhpos		= dialogwidth - margin - 2*btnwidth - gap;
-//		cancelbtnhpos	= dialogwidth - margin - btnwidth;		
+		okbtnhpos		= dialogwidth - margin - 2*btnwidth - gap;
+		cancelbtnhpos	= dialogwidth - margin - btnwidth;		
 		
 		initBox();
 	}
@@ -76,7 +78,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 
 		initialize (
 				new String[] { "Height", "Moveable", "Name", "PositionX", "PositionY", "Sizeable", "Step", "TabIndex", "Title", "Width" },
-				new Object[] { dialogheight, true, "loInputBox", dialogxpos, dialogypos, true, 0, (short)0, "loInputBox", dialogwidth }
+				new Object[] { dialogheight, true, "loInputBox", dialogxpos, dialogypos, false, 0, (short)0, "loInputBox", dialogwidth }
 		);
 		
 		// add dialog controls
@@ -190,6 +192,38 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			e.printStackTrace(System.err);
 			// One or more fonts will just be wrong.
 		}
+		
+		XLayoutConstrains xLayoutConstrains = UnoRuntime.queryInterface(XLayoutConstrains.class, guiLabel);
+		com.sun.star.awt.Size s = xLayoutConstrains.getPreferredSize();
+		System.out.println(s.Width + "x" + s.Height);
+		
+		XWindow loLabelWindow = UnoRuntime.queryInterface(XWindow.class, guiLabel);
+		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loLabelWindow);
+		Point ptLabelPixels   = new Point(s.Width, s.Height);
+		Point ptLabelDlgUnits = m_xConversion.convertPointToLogic(ptLabelPixels, MeasureUnit.APPFONT);
+		
+		try {
+			xLabelProps.setPropertyValue("Width", ptLabelDlgUnits.X);
+			//xLabelProps.setPropertyValue("BackgroundColor", 32768);
+			//xLabelProps.setPropertyValue("Label", "Hello, world! How's tricks?");
+		} catch (Exception e) {
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			e.printStackTrace(System.err);
+			// Label width will just be wrong.
+		}		
+		
+		dialogwidth = (2*margin) + iconsize + ptLabelDlgUnits.X + (2*gap);
+		
+		XControlModel xDialogModel = m_xDialogControl.getModel();
+		XPropertySet xDialogProps = UnoRuntime.queryInterface(XPropertySet.class, xDialogModel);
+		try {
+			xDialogProps.setPropertyValue("Width", dialogwidth);
+			//xDialogProps.setPropertyValue("Height", dialogheight);
+		} catch (Exception e) {
+			// nop -- default dimensions will be used
+		}
+		
+		configButtons(cancelbtn);
 		
 		return super.show(xDoc, title);
 	}
