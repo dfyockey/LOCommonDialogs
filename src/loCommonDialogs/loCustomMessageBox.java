@@ -121,12 +121,13 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		return show(xDoc, title, message, rawhexPng);
 	}
 	*/
-	
-	public short show(XModel xDoc, String title, String message, String subtext, int iconIndex) {
-		return show(xDoc, title, message, subtext, iconIndex, false);
+
+	// Convenience method for show with no cancel button
+	public short show(XModel xDoc, String title, String message, int iconIndex) {
+		return show(xDoc, title, message, iconIndex, false);
 	}
 	
-	public short show(XModel xDoc, String title, String message, String subtext, int iconIndex, boolean cancelbtn) {
+	public short show(XModel xDoc, String title, String message, int iconIndex, boolean cancelbtn) {
 		
 		String icontype = "";
 
@@ -154,19 +155,16 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			iconURL = new ImageProc("/images/" + icontype + ".svg").getURL();
 		}
 		
-		return show(xDoc, title, message, subtext, iconURL);
+		return show(xDoc, title, message, iconURL, cancelbtn);
 	}
 	
-	public short show(XModel xDoc, String title, String message, String subtext, String iconURL) {
-		return show(xDoc, title, message, subtext, iconURL, false);
-	}
+	// Convenience method for show with no cancel button
+	public short show(XModel xDoc, String title, String message, String iconURL) {
+		return show(xDoc, title, message, iconURL, false);
+	}	
 	
-	public short show(XModel xDoc, String title, String message, String subtext, String iconURL, boolean cancelbtn) {
+	public short show(XModel xDoc, String title, String message, String iconURL, boolean cancelbtn) {
 		// Use MessageBoxType.ERRORBOX for a System Error, MessageBoxType.INFOBOX for a User Error, or MessageBoxType.WARNINGBOX for a Warning
-		
-		// NOTE: Since guiLabel2 has been removed from the dialog, String subtext is ignored.
-		//       The argument is retained for compatibility with existing method calls,
-		//       but should be removed in a future version.
 		
 		// Configure Warning Text to the current Application Font and at size 12pt and BOLD
 		//// Get Label XPropertySet interface
@@ -258,5 +256,24 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			// nop - buttons will just be misplaced.
 		}
-	}	
+	}
+	
+	/* DEPRECATED METHODS
+	 * 		retained temporarily for backward compatibility
+	 */
+	public short show(XModel xDoc, String title, String message, String subtext, int iconIndex) {
+		return show(xDoc, title, message, iconIndex, false);
+	}
+	
+	public short show(XModel xDoc, String title, String message, String subtext, int iconIndex, boolean cancelbtn) {
+		return show(xDoc, title, message, iconIndex, cancelbtn);
+	}
+	
+	public short show(XModel xDoc, String title, String message, String subtext, String iconURL) {
+		return show(xDoc, title, message, iconURL, false);
+	}
+	
+	public short show(XModel xDoc, String title, String message, String subtext, String iconURL, boolean cancelbtn) {
+		return show(xDoc, title, message, iconURL, cancelbtn);
+	}
 }
