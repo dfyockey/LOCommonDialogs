@@ -114,15 +114,15 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		dialogwidth		= 200;
 		OKhorizpos		= dialogwidth/2 - btnwidth - gap/2;
 		Cancelhorizpos	= dialogwidth/2 + gap/2;
-		btnvertpos		= margin + iconsize + fieldheight + 4*gap;
-		fieldwidth		= dialogwidth/4 - (2*margin);
-		fieldvertpos	= margin + iconsize + gap;
+		btnvertpos		= padding + iconsize + fieldheight + 4*gap;
+		fieldwidth		= dialogwidth/4 - (2*padding);
+		fieldvertpos	= padding + iconsize + gap;
 		fieldhorizpos	= dialogwidth/2 - fieldwidth/2;
-		labelwidth		= dialogwidth - (2*margin) - iconsize - gap;
+		labelwidth		= dialogwidth - (2*padding) - iconsize - gap;
 		labelheight		= iconsize;
-		labelposX		= margin + iconsize;
-		labelposY		= margin;
-		dialogheight	= btnvertpos + btnheight + margin + 3;	// 3 is a fudge factor
+		labelposX		= padding + iconsize;
+		labelposY		= padding;
+		dialogheight	= btnvertpos + btnheight + padding + 3;	// 3 is a fudge factor
 		dialogxpos  	= 0;
 		dialogypos  	= 0;
 		
@@ -135,7 +135,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		try {
 			String rawhexMessage = "";
 			byte[] hexbinaryMessage = DatatypeConverter.parseHexBinary(rawhexMessage);
-			guiIcon = insertImage(margin, margin, iconsize, iconsize, hexbinaryMessage, "png");
+			guiIcon = insertImage(padding, padding, iconsize, iconsize, hexbinaryMessage, "png");
 						
 			guiLabel	 = insertFixedText(textalign_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
 			guiEditBox	 = insertEditField(textalign_center, fieldhorizpos, fieldvertpos, fieldwidth, fieldheight);

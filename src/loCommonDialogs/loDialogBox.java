@@ -67,7 +67,7 @@ public abstract class loDialogBox implements AutoCloseable {
 	// and usable by derived classes to facilitate providing consistent dialog appearance.
 	// All values are in dialog units (i.e. APPFONT units)
 	protected int iconsize		= 16;			// Icon height/width
-	protected int margin		= 4;			// Padding used to space dialog objects from the inner edge of the dialog (yes, it's misnamed...)
+	protected int padding		= 4;			// Padding used to space dialog objects from the inner edge of the dialog
 	protected int fieldwidth	= 120;			// Edit Field width; by convention, this should always be >= btngap+(2*btnwidth)
 	protected int fieldheight	= 12;			// Edit Field height
 	protected int fieldborderwidth = 3;			// Width of the border around the Edit Field

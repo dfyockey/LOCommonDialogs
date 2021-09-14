@@ -47,14 +47,14 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	
 	public loCustomMessageBox(XComponentContext xComponentContext) {
 		super(xComponentContext);
-		gap				= margin;
-		vmargin			= margin;		// Amount to offset everything from the top
+		gap				= padding;
+		vmargin			= padding;		// Amount to offset everything from the top
 		iconsize		= 28;
 		dialogwidth		= 175;
-		labelwidth		= dialogwidth - iconsize - (2*margin) - (2*gap);
+		labelwidth		= dialogwidth - iconsize - (2*padding) - (2*gap);
 		labelheight		= iconsize;
 		labelvertpos	= vmargin;
-		labelhorizpos	= margin + iconsize + gap;
+		labelhorizpos	= padding + iconsize + gap;
 		//btnvertpos		= dialogheight - btnheight - margin - 3;	// 3 is a fudge factor
 		btnvertpos		= vmargin + labelheight;
 		
@@ -65,8 +65,8 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 //		cancelbtnhpos	= dialogwidth/2 + gap/2;
 		
 		// Right-Justified Buttons
-		okbtnhpos		= dialogwidth - margin - 2*btnwidth - gap;
-		cancelbtnhpos	= dialogwidth - margin - btnwidth;		
+		okbtnhpos		= dialogwidth - padding - 2*btnwidth - gap;
+		cancelbtnhpos	= dialogwidth - padding - btnwidth;		
 		
 		initBox();
 	}
@@ -85,7 +85,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		try {
 			// Message Icon (Default)
 			String msgicon = new ImageProc("/images/message.svg").getURL();
-			guiIcon = insertImage(margin, vmargin, iconsize, iconsize, msgicon);
+			guiIcon = insertImage(padding, vmargin, iconsize, iconsize, msgicon);
 			
 			guiLabel 	 = insertFixedText(textalign_left, labelhorizpos, labelvertpos, labelwidth, labelheight, 0, "");
 			guiOKBtn 	 = insertButton(okbtnhpos, btnvertpos, btnwidth, btnheight, "OK", (short) PushButtonType.OK_value, true);
@@ -212,7 +212,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 			// Label width will just be wrong.
 		}		
 		
-		dialogwidth = (2*margin) + iconsize + ptLabelDlgUnits.X + (2*gap);
+		dialogwidth = (2*padding) + iconsize + ptLabelDlgUnits.X + (2*gap);
 		
 		XControlModel xDialogModel = m_xDialogControl.getModel();
 		XPropertySet xDialogProps = UnoRuntime.queryInterface(XPropertySet.class, xDialogModel);

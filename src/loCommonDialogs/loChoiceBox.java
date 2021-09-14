@@ -44,17 +44,17 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		
 		dialogwidth		= 235;
 		
-		labelwidth		= dialogwidth - (2*margin) - iconsize - gap;
+		labelwidth		= dialogwidth - (2*padding) - iconsize - gap;
 		labelheight		= iconsize;
-		labelposX		= margin + iconsize;
-		labelposY		= margin;
+		labelposX		= padding + iconsize;
+		labelposY		= padding;
 		
-		btnvertpos		= margin + labelheight;	
+		btnvertpos		= padding + labelheight;	
 		Btn2horizpos	= (dialogwidth - (3*btnwidth) - (2*gap)) / 2;
 		Btn1horizpos	= Btn2horizpos + (btnwidth + gap);
 		Cancelhorizpos	= Btn1horizpos + (btnwidth + gap);
 		
-		dialogheight	= margin + iconsize + btnheight + margin + 3;	// 3 is a fudge factor
+		dialogheight	= padding + iconsize + btnheight + padding + 3;	// 3 is a fudge factor
 		
 		initBox();
 	}
@@ -73,7 +73,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 			guiLabel = insertFixedText(loDialogBox.textalign_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
 
 			String iconNone = "";
-			guiIcon = insertImage(margin, margin, iconsize, iconsize, iconNone);
+			guiIcon = insertImage(padding, padding, iconsize, iconsize, iconNone);
 			
 			//// In the following, return values from com.sun.star.awt.MessageBoxResults are used for choice buttons
 			//// to make loChoiceBox a drop-in replacement for a XMessageBox-based Yes/No/Cancel messagebox.
