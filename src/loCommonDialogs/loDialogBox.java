@@ -63,26 +63,26 @@ public abstract class loDialogBox implements AutoCloseable {
 	protected XControlContainer		m_xDlgContainer;
 	protected XControl				m_xDialogControl;
 
-	// Dialog and Control Size & Position Default Values
-	// usable by derived classes to facilitate providing
-	// consistent dialog appearance
-	protected int iconsize		= 16;
-	protected int margin		= 4;
-	protected int fieldwidth	= 120;	// Should be >= btngap+(2*btnwidth)
-	protected int fieldheight	= 12;
-	protected int fieldborderwidth = 3;	// Width of the border around an edit field
-	protected int labelwidth	= fieldwidth;
-	protected int labelheight	= 24;
-	protected int labelborderwidth = 1;	// Width of the border around a label
-	protected int btnwidth		= 32;
-	protected int btnheight		= 14;
-	protected int gap			= 3;
+	// Dialog and Control Size & Position Variables provided with arbitrary default values
+	// and usable by derived classes to facilitate providing consistent dialog appearance.
+	// All values are in dialog units (i.e. APPFONT units)
+	protected int iconsize		= 16;			// Icon height/width
+	protected int margin		= 4;			// Padding used to space dialog objects from the inner edge of the dialog (yes, it's misnamed...)
+	protected int fieldwidth	= 120;			// Edit Field width; by convention, this should always be >= btngap+(2*btnwidth)
+	protected int fieldheight	= 12;			// Edit Field height
+	protected int fieldborderwidth = 3;			// Width of the border around the Edit Field
+	protected int labelwidth	= fieldwidth;	// Label width
+	protected int labelheight	= 24;			// Label height
+	protected int labelborderwidth = 1;			// Width of the border around the Label
+	protected int btnwidth		= 32;			// Width of a Button
+	protected int btnheight		= 14;			// Height of a Button
+	protected int gap			= 3;			// Gap used between dialog objects to space them apart
 	
 	// Dialog initialization values (in dialog units)
 	
 	protected final int mindialogwidth  = 107;	// These minimum values appear to be either a bug or an undocumented feature.
 	protected final int mindialogheight = 107;	// They are easily demonstrable by previewing a dialog with lesser values
-												// in the LibreOffice Dialog Editor.
+												// in the LibreOffice Dialog Editor (at least in LibreOffice 6.x)
 	
 	protected int dialogwidth  = mindialogwidth;
 	protected int dialogheight = mindialogheight;
