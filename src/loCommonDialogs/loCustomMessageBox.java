@@ -33,11 +33,8 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	public static boolean showCancelBtn = true;
 	public static boolean hideCancelBtn = false;
 	
-	// Dialog and Control Size & Position Values
-	private int labelvertpos, labelhorizpos;
+	// Control Position Values
 	private int btnvertpos, okbtnhpos, cancelbtnhpos;
-	private int vmargin;
-	private int gap;
 	
 	// Control Instance Storage
 	private XFixedText	guiLabel;
@@ -47,27 +44,6 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	
 	public loCustomMessageBox(XComponentContext xComponentContext) {
 		super(xComponentContext);
-		gap				= padding;
-		vmargin			= padding;		// Amount to offset everything from the top
-		iconsize		= 28;
-		dialogwidth		= 175;
-		labelwidth		= dialogwidth - iconsize - (2*padding) - (2*gap);
-		labelheight		= iconsize;
-		labelvertpos	= vmargin;
-		labelhorizpos	= padding + iconsize + gap;
-		//btnvertpos		= dialogheight - btnheight - margin - 3;	// 3 is a fudge factor
-		btnvertpos		= vmargin + labelheight;
-		
-		dialogheight	= vmargin + labelheight + labelborderwidth*2 + btnheight + 2 + vmargin;	// 2 = button border width?
-		
-		// Centered Buttons
-//		okbtnhpos		= dialogwidth/2 - btnwidth - gap/2;
-//		cancelbtnhpos	= dialogwidth/2 + gap/2;
-		
-		// Right-Justified Buttons
-		okbtnhpos		= dialogwidth - padding - 2*btnwidth - gap;
-		cancelbtnhpos	= dialogwidth - padding - btnwidth;		
-		
 		initBox();
 	}
 	
@@ -78,14 +54,12 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 
 		initialize (
 				new String[] { "Height", "Moveable", "Name", "PositionX", "PositionY", "Sizeable", "Step", "TabIndex", "Title", "Width" },
-				new Object[] { dialogheight, true, "loInputBox", dialogxpos, dialogypos, false, 0, (short)0, "loInputBox", dialogwidth }
+				new Object[] { dialogheight, true, "loCommonMessageBox", dialogxpos, dialogypos, false, 0, (short)0, "loCommonMessageBox", dialogwidth }
 		);
 		
 		// add dialog controls
 		try {
-			// Message Icon (Default)
-			String msgicon = new ImageProc("/images/message.svg").getURL();
-			guiIcon = insertImage(padding, vmargin, iconsize, iconsize, msgicon);
+			guiIcon = insertImage(padding, padding, iconsize, iconsize, "");
 			
 			guiLabel 	 = insertFixedText(textalign_left, labelhorizpos, labelvertpos, labelwidth, labelheight, 0, "");
 			guiOKBtn 	 = insertButton(okbtnhpos, btnvertpos, btnwidth, btnheight, "OK", (short) PushButtonType.OK_value, true);
@@ -99,29 +73,6 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
 	
-	/*
-	 * Implement dialog resizing on show, with accompanying control repositioning, in a future version...
-	 *
-	 * DON'T DELETE THIS!
-	 * 
-	public short show(XModel xDoc, String title, String message, String rawhexPng, int dlgWidth) {
-		return show(xDoc, title, message, rawhexPng, dlgWidth, dialogheight);
-	}
-	
-	public short show(XModel xDoc, String title, String message, String rawhexPng, int dlgWidth, int dlgHeight) {
-		XControlModel xDialogModel = m_xDialogControl.getModel();
-		XPropertySet xDialogProps = UnoRuntime.queryInterface(XPropertySet.class, xDialogModel);
-		try {
-			xDialogProps.setPropertyValue("Width", dlgWidth);
-			xDialogProps.setPropertyValue("Height", dlgHeight);
-		} catch (Exception e) {
-			// nop -- default dimensions will be used
-		}
-		
-		return show(xDoc, title, message, rawhexPng);
-	}
-	*/
-
 	// Convenience method for show with no cancel button
 	public short show(XModel xDoc, String title, String message, int iconIndex) {
 		return show(xDoc, title, message, iconIndex, false);
@@ -134,6 +85,10 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		configButtons(cancelbtn);
 		
 		switch (iconIndex) {
+			case 0:
+				// Message Icon
+				icontype = "message";
+				break;
 			case 1:
 				// Warning Icon
 				icontype = "warning";
@@ -164,59 +119,75 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	}	
 	
 	public short show(XModel xDoc, String title, String message, String iconURL, boolean cancelbtn) {
-		// Use MessageBoxType.ERRORBOX for a System Error, MessageBoxType.INFOBOX for a User Error, or MessageBoxType.WARNINGBOX for a Warning
-		
-		// Configure Warning Text to the current Application Font and at size 12pt and BOLD
-		//// Get Label XPropertySet interface
-		XPropertySet xLabelProps = getControlProps(guiLabel);
-		
-		//// Get FontDescriptor for Application Font
-		FontDescriptor appFontDescriptor = getAppFontDescriptor(xDoc);
-		appFontDescriptor.Height = 10;
-		appFontDescriptor.Weight = FontWeight.BOLD;
+
+		// Configure Icon
 		
 		if (!iconURL.isEmpty())
 			configIcon(guiIcon, iconURL);
 		
+		
+		// Configure Label
+		
+		//// Get and adjust FontDescriptor for Label Font
+		FontDescriptor labelFontDescriptor = getLabelFontDescriptor(xDoc);
+		labelFontDescriptor.Weight = FontWeight.BOLD;
+
+		//// Set Label Properties
+		XPropertySet xLabelProps = getControlProps(guiLabel);
 		try {
 			xLabelProps.setPropertyValue("Label", message);
-			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
-			
-//			appFontDescriptor.Height = 10;
-//			appFontDescriptor.Weight = FontWeight.NORMAL;
-			
+			xLabelProps.setPropertyValue("FontDescriptor", labelFontDescriptor);
 		} catch (Exception e) {
 			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			e.printStackTrace(System.err);
 			// One or more fonts will just be wrong.
 		}
 		
+		//// Get Label size in pixels necessary to contain its text
 		XLayoutConstrains xLayoutConstrains = UnoRuntime.queryInterface(XLayoutConstrains.class, guiLabel);
 		com.sun.star.awt.Size s = xLayoutConstrains.getPreferredSize();
-		System.out.println(s.Width + "x" + s.Height);
 		
-		XWindow loLabelWindow = UnoRuntime.queryInterface(XWindow.class, guiLabel);
-		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, loLabelWindow);
+		//// Convert the Label size in pixels to the size in dialog units (i.e. APPFONT units)
+		XWindow guiLabelWindow = UnoRuntime.queryInterface(XWindow.class, guiLabel);
+		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, guiLabelWindow);
 		Point ptLabelPixels   = new Point(s.Width, s.Height);
 		Point ptLabelDlgUnits = m_xConversion.convertPointToLogic(ptLabelPixels, MeasureUnit.APPFONT);
+		labelwidth  = ptLabelDlgUnits.X;
+		labelheight = ptLabelDlgUnits.Y;
 		
+		//// Set Label Width and Height to accommodate its text, and
+		//// set the Label and Button vertical positions
 		try {
-			xLabelProps.setPropertyValue("Width", ptLabelDlgUnits.X);
-			//xLabelProps.setPropertyValue("BackgroundColor", 32768);
-			//xLabelProps.setPropertyValue("Label", "Hello, world! How's tricks?");
+			xLabelProps.setPropertyValue("Width", labelwidth);
+			xLabelProps.setPropertyValue("Height", labelheight);
+			
+			// Vertically position the Label relative to the Icon
+			if ( ptLabelDlgUnits.Y < iconsize ) {
+				// Vertically center the Label relative to the Icon
+				labelvertpos = padding + (iconsize / 2 - labelheight / 2);
+				btnvertpos   = padding + iconsize + gap/2;
+			} else {
+				// Vertically position the Label at the same position as the Icon
+				labelvertpos = padding;
+				btnvertpos   = labelvertpos + ptLabelDlgUnits.Y;
+			}
+			xLabelProps.setPropertyValue("PositionY", labelvertpos);
 		} catch (Exception e) {
 			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
 			e.printStackTrace(System.err);
-			// Label width will just be wrong.
+			// Label dimensions will just be wrong.
 		}		
 		
-		dialogwidth = (2*padding) + iconsize + ptLabelDlgUnits.X + (2*gap);
+		// Calculate and Set Dialog Width and Height
+
+		dialogwidth = (2*padding) + iconsize + ptLabelDlgUnits.X + gap;
+		dialogheight = btnvertpos + btnheight + padding;
 		
 		XControlModel xDialogModel = m_xDialogControl.getModel();
 		XPropertySet xDialogProps = UnoRuntime.queryInterface(XPropertySet.class, xDialogModel);
 		try {
 			xDialogProps.setPropertyValue("Width", dialogwidth);
-			//xDialogProps.setPropertyValue("Height", dialogheight);
+			xDialogProps.setPropertyValue("Height", dialogheight);
 		} catch (Exception e) {
 			// nop -- default dimensions will be used
 		}
@@ -240,17 +211,27 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 				
 				// Centered Buttons
 				xOKBtnProps.setPropertyValue("PositionX", dialogwidth/2 - btnwidth - gap/2);
+				xOKBtnProps.setPropertyValue("PositionY", btnvertpos );
 				xCancelBtnWindow.setVisible(true);
+				xCancelBtnProps.setPropertyValue("PositionY", btnvertpos );
 				xCancelBtnProps.setPropertyValue("PositionX", dialogwidth/2 + gap/2);
 				
 				// Right-Justified Buttons
-//				xOKBtnProps.setPropertyValue("PositionX", dialogwidth - margin - 2*btnwidth - gap);
+//				xOKBtnProps.setPropertyValue("PositionX", dialogwidth - padding - 2*btnwidth - gap);
 //				xCancelBtnWindow.setVisible(true);
-//				xCancelBtnProps.setPropertyValue("PositionX", dialogwidth - margin - btnwidth);
+//				xCancelBtnProps.setPropertyValue("PositionX", dialogwidth - padding - btnwidth);
 				
 			} else {
+				// Centered Buttons
 				xOKBtnProps.setPropertyValue("PositionX", dialogwidth/2 - btnwidth/2);
+				xOKBtnProps.setPropertyValue("PositionY", btnvertpos );
 				xCancelBtnWindow.setVisible(false);
+				
+				// Right-Justified Buttons
+//				xOKBtnProps.setPropertyValue("PositionX", dialogwidth - padding - btnwidth);
+//				xOKBtnProps.setPropertyValue("PositionY", btnvertpos );
+//				xCancelBtnWindow.setVisible(false);
+				
 			}
 		} catch (Exception e) {
 			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);

@@ -66,24 +66,31 @@ public abstract class loDialogBox implements AutoCloseable {
 	// Dialog and Control Size & Position Variables provided with arbitrary default values
 	// and usable by derived classes to facilitate providing consistent dialog appearance.
 	// All values are in dialog units (i.e. APPFONT units)
-	protected int iconsize		= 16;			// Icon height/width
-	protected int padding		= 4;			// Padding used to space dialog objects from the inner edge of the dialog
-	protected int fieldwidth	= 120;			// Edit Field width; by convention, this should always be >= btngap+(2*btnwidth)
-	protected int fieldheight	= 12;			// Edit Field height
-	protected int fieldborderwidth = 3;			// Width of the border around the Edit Field
-	protected int labelwidth	= fieldwidth;	// Label width
-	protected int labelheight	= 24;			// Label height
-	protected int labelborderwidth = 1;			// Width of the border around the Label
-	protected int btnwidth		= 32;			// Width of a Button
-	protected int btnheight		= 14;			// Height of a Button
-	protected int gap			= 3;			// Gap used between dialog objects to space them apart
+	protected int iconsize			= 26;					// Icon height/width
+	protected int padding			= 4;					// Padding used to space dialog objects from the inner edge of the dialog
+	protected int gap				= 4;					// Gap used between dialog objects to space them apart
+	protected int fieldwidth		= 120;					// Edit Field width; by convention, this should always be >= btngap+(2*btnwidth)
+	protected int fieldheight		= 12;					// Edit Field height
+	protected int fieldborderwidth	= 3;					// Width of the border around the Edit Field
+	protected int labelwidth		= fieldwidth;			// Label width
+	protected int labelheight		= 24;					// Label height
+	protected int labelborderwidth	= 1;					// Width of the border around the Label
+	protected int labelvertpos		= padding;				// Label vertical position
+	protected int labelhorizpos 	= padding+iconsize+gap-labelborderwidth;	// Label horizontal position (must recalc in derived class if any of the addend value is changed)
+	protected int btnwidth			= 32;					// Width of a Button
+	protected int btnheight			= 14;					// Height of a Button
+	protected int btnborderwidth 	= 1;					// Assumed width of the border around the Label
 	
 	// Dialog initialization values (in dialog units)
 	
 	protected final int mindialogwidth  = 107;	// These minimum values appear to be either a bug or an undocumented feature.
 	protected final int mindialogheight = 107;	// They are easily demonstrable by previewing a dialog with lesser values
-												// in the LibreOffice Dialog Editor (at least in LibreOffice 6.x)
+												// in the LibreOffice Dialog Editor (at least in LibreOffice 6.x).
+												//
+												// This bug is fixed in at least as early as LibreOffice 7.1.
+												// Earlier versions have not bee checked. 
 	
+	// Note: A dialog's width and height cannot be changed after the dialog has been executed
 	protected int dialogwidth  = mindialogwidth;
 	protected int dialogheight = mindialogheight;
 	protected int dialogxpos   = 0;
@@ -421,9 +428,17 @@ public abstract class loDialogBox implements AutoCloseable {
 		return UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
 	}
 	
+	// I can't remember, but I may have discovered that XStyleSettings provides the method `getApplicationFont()` from use of MRI (the UNO Object Inspection Tool),
+	// as suggested by jimk at https://ask.libreoffice.org/t/documentation-for-xstylesettings-supporting-getters/68158/2
 	protected FontDescriptor getAppFontDescriptor (XModel xDoc) {
 		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
 		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
 		return xStyleSettings.getApplicationFont();
+	}
+	
+	protected FontDescriptor getLabelFontDescriptor (XModel xDoc) {
+		XStyleSettingsSupplier xStyleSettingsSupplier = UnoRuntime.queryInterface(XStyleSettingsSupplier.class, xDoc.getCurrentController().getFrame().getContainerWindow());
+		XStyleSettings xStyleSettings = xStyleSettingsSupplier.getStyleSettings();
+		return xStyleSettings.getLabelFont();
 	}
 }
