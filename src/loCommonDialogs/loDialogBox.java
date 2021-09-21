@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import javax.xml.bind.DatatypeConverter;
 
 import com.sun.star.awt.FontDescriptor;
+import com.sun.star.awt.FontWeight;
 import com.sun.star.awt.ImageScaleMode;
 import com.sun.star.awt.Point;
 import com.sun.star.awt.Rectangle;
@@ -14,6 +15,7 @@ import com.sun.star.awt.XControlContainer;
 import com.sun.star.awt.XControlModel;
 import com.sun.star.awt.XDialog;
 import com.sun.star.awt.XFixedText;
+import com.sun.star.awt.XLayoutConstrains;
 import com.sun.star.awt.XReschedule;
 import com.sun.star.awt.XStyleSettings;
 import com.sun.star.awt.XStyleSettingsSupplier;
@@ -75,10 +77,11 @@ public abstract class loDialogBox implements AutoCloseable {
 	protected int labelwidth		= fieldwidth;			// Label width
 	protected int labelheight		= 24;					// Label height
 	protected int labelborderwidth	= 1;					// Width of the border around the Label
-	protected int labelvertpos		= padding;				// Label vertical position
-	protected int labelhorizpos 	= padding+iconsize+gap-labelborderwidth;	// Label horizontal position (must recalc in derived class if any of the addend value is changed)
+	protected int labelposX 		= padding+iconsize+gap-labelborderwidth;	// Label horizontal position (must recalc in derived class if any of the addend value is changed)
+	protected int labelposY			= padding;				// Label vertical position
 	protected int btnwidth			= 32;					// Width of a Button
 	protected int btnheight			= 14;					// Height of a Button
+	protected int btnvertpos		= padding+iconsize;		// Vertical position of button(s)
 	protected int btnborderwidth 	= 1;					// Assumed width of the border around the Label
 	
 	// Dialog initialization values (in dialog units)
@@ -420,6 +423,90 @@ public abstract class loDialogBox implements AutoCloseable {
 				// nop - There'll just be no custom icon.
 			}
 		}
+	}
+	
+	protected XPropertySet formatLabelText (XModel xDoc, XFixedText guiLabel, String labeltext) {
+		//// Get and adjust FontDescriptor for Label Font
+		FontDescriptor labelFontDescriptor = getLabelFontDescriptor(xDoc);
+		labelFontDescriptor.Weight = FontWeight.BOLD;
+		
+		//// Set Label Properties
+		XPropertySet xLabelProps = getControlProps(guiLabel);
+		try {
+			xLabelProps.setPropertyValue("Label", labeltext);
+			xLabelProps.setPropertyValue("FontDescriptor", labelFontDescriptor);
+		} catch (Exception e) {
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			e.printStackTrace(System.err);
+			// One or more fonts will just be wrong.
+		}
+		
+		return xLabelProps;
+	}
+	
+	protected XPropertySet sizeLabel (XModel xDoc, XFixedText guiLabel, String labeltext) {
+		// Set Label Width and Height to accommodate its text
+		
+		XPropertySet xLabelProps = formatLabelText(xDoc, guiLabel, labeltext);
+		
+		//// Get Label size in pixels necessary to contain its text
+		XLayoutConstrains xLayoutConstrains = UnoRuntime.queryInterface(XLayoutConstrains.class, guiLabel);
+		com.sun.star.awt.Size s = xLayoutConstrains.getPreferredSize();
+		
+		//// Convert the Label size in pixels to the size in dialog units (i.e. APPFONT units)
+		XWindow guiLabelWindow = UnoRuntime.queryInterface(XWindow.class, guiLabel);
+		XUnitConversion m_xConversion = UnoRuntime.queryInterface(XUnitConversion.class, guiLabelWindow);
+		Point ptLabelPixels   = new Point(s.Width, s.Height);
+		Point ptLabelDlgUnits = m_xConversion.convertPointToLogic(ptLabelPixels, MeasureUnit.APPFONT);
+		labelwidth  = ptLabelDlgUnits.X;
+		labelheight = ptLabelDlgUnits.Y;
+		
+		try {
+			xLabelProps.setPropertyValue("Width", labelwidth);
+			xLabelProps.setPropertyValue("Height", labelheight);
+		} catch (Exception e) {
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			e.printStackTrace(System.err);
+			// Label dimensions will just be wrong.
+		}
+		
+		return xLabelProps;
+	}
+	
+	protected void calcLabelAndBtnVertPos () {
+		// set the Label and Button vertical positions
+		
+		//// Vertically position the Label and Button(s) relative to the Icon
+		if ( labelheight < iconsize ) {
+			// Vertically center the Label relative to the Icon
+			labelposY = padding + (iconsize / 2 - labelheight / 2);
+			btnvertpos   = padding + iconsize + gap/2;
+		} else {
+			// Vertically position the Label at the same position as the Icon
+			labelposY = padding;
+			btnvertpos   = labelposY + labelheight;
+		}
+	}
+	
+	protected void setLabelVertPos (XPropertySet xLabelProps) {
+		try {		
+			xLabelProps.setPropertyValue("PositionY", labelposY);
+		} catch (Exception e) {
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			e.printStackTrace(System.err);
+			// Label dimensions will just be wrong.
+		}
+	}
+	
+	protected void setDialogSize () {
+		XControlModel xDialogModel = m_xDialogControl.getModel();
+		XPropertySet xDialogProps = UnoRuntime.queryInterface(XPropertySet.class, xDialogModel);
+		try {
+			xDialogProps.setPropertyValue("Width", dialogwidth);
+			xDialogProps.setPropertyValue("Height", dialogheight);
+		} catch (Exception e) {
+			// nop -- default dimensions will be used
+		}		
 	}
 	
 	protected XPropertySet getControlProps (Object guiObject) {

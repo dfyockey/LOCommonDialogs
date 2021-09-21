@@ -2,8 +2,6 @@ package loCommonDialogs;
 
 import java.util.logging.Level;
 
-import com.sun.star.awt.FontDescriptor;
-import com.sun.star.awt.FontWeight;
 import com.sun.star.awt.PushButtonType;
 import com.sun.star.awt.XActionListener;
 import com.sun.star.awt.XButton;
@@ -21,10 +19,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 
 	short btnclicked = 0;
 	
-	// Dialog and Control Size & Position Values
-	private int labelposX;
-	private int labelposY;
-	private int btnvertpos;
+	// Button Position Values
 	private int Btn2horizpos;
 	private int Btn1horizpos;
 	private int Cancelhorizpos;
@@ -34,28 +29,10 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 	private XButton		guiChoiceBtn2;
 	private XButton		guiChoiceBtn1;
 	private XControl	guiIcon;
-	@SuppressWarnings("unused")
 	private XButton		guiCancelBtn;
 	
 	public loChoiceBox(XComponentContext xComponentContext) {
-		// w = dialog width, h = dialog height, 0 for either = minimum value
 		super(xComponentContext);
-		iconsize		= 30;
-		
-		dialogwidth		= 235;
-		
-		labelwidth		= dialogwidth - (2*padding) - iconsize - gap;
-		labelheight		= iconsize;
-		labelposX		= padding + iconsize;
-		labelposY		= padding;
-		
-		btnvertpos		= padding + labelheight;	
-		Btn2horizpos	= (dialogwidth - (3*btnwidth) - (2*gap)) / 2;
-		Btn1horizpos	= Btn2horizpos + (btnwidth + gap);
-		Cancelhorizpos	= Btn1horizpos + (btnwidth + gap);
-		
-		dialogheight	= padding + iconsize + btnheight + padding + 3;	// 3 is a fudge factor
-		
 		initBox();
 	}
 	
@@ -70,7 +47,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		
 		// add dialog controls
 		try {
-			guiLabel = insertFixedText(loDialogBox.textalign_center, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
+			guiLabel = insertFixedText(loDialogBox.textalign_left, labelposX, labelposY, labelwidth, labelheight, 0, "Input something!");
 
 			String iconNone = "";
 			guiIcon = insertImage(padding, padding, iconsize, iconsize, iconNone);
@@ -107,30 +84,55 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		if (ImageUrl != "")
 			configIcon(guiIcon, ImageUrl);
 		
-		guiLabel.setText(labeltext);
 		guiChoiceBtn2.setLabel(btnlabel2);
 		guiChoiceBtn1.setLabel(btnlabel1);
-
-		// Get Label XPropertySet interface
-		XPropertySet xLabelProps = getControlProps(guiLabel);
-
-		// Get FontDescriptor
-		FontDescriptor appFontDescriptor = getAppFontDescriptor(xDoc);
-		appFontDescriptor.Height = 10;
-		appFontDescriptor.Weight = FontWeight.BOLD;
 		
-		try {
-			// Config Label's font
-			xLabelProps.setPropertyValue("FontDescriptor", appFontDescriptor);
-		} catch (Exception e) {
-			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
-			e.printStackTrace(System.err);
-			// Font will just be wrong.
-		}
+		// Configure Label
+		XPropertySet xLabelProps = sizeLabel(xDoc, guiLabel, labeltext);
+		calcLabelAndBtnVertPos();
+		setLabelVertPos(xLabelProps);
+		
+		// Calculate Dialog Width and Height
+		dialogwidth = (2*padding) + iconsize + labelwidth + gap;
+		dialogheight = btnvertpos + btnheight + padding;
+		
+		setDialogSize();
+		
+		configButtons();
 		
 		btnclicked = 0;
 			super.show(xDoc, title);	// If one of the choice buttons is clicked, the associated ActionListenerImpl changes btnclicked accordingly.
 		return btnclicked;
+	}
+	
+	private void configButtons () {
+		try {
+			XControl xChoiceBtn2Control = UnoRuntime.queryInterface(XControl.class, guiChoiceBtn2);
+			XPropertySet xChoiceBtn2Props = UnoRuntime.queryInterface(XPropertySet.class, xChoiceBtn2Control.getModel());
+			
+			XControl xChoiceBtn1Control = UnoRuntime.queryInterface(XControl.class, guiChoiceBtn1);
+			XPropertySet xChoiceBtn1Props = UnoRuntime.queryInterface(XPropertySet.class, xChoiceBtn1Control.getModel());
+			
+			XControl xCancelBtnControl = UnoRuntime.queryInterface(XControl.class, guiCancelBtn);
+			XPropertySet xCancelBtnProps = UnoRuntime.queryInterface(XPropertySet.class, xCancelBtnControl.getModel());
+			
+			Btn2horizpos	= (dialogwidth - (3*btnwidth) - (2*gap)) / 2;
+			Btn1horizpos	= Btn2horizpos + (btnwidth + gap);
+			Cancelhorizpos	= Btn1horizpos + (btnwidth + gap);
+			
+			xChoiceBtn2Props.setPropertyValue("PositionX", Btn2horizpos);
+			xChoiceBtn2Props.setPropertyValue("PositionY", btnvertpos);
+			
+			xChoiceBtn1Props.setPropertyValue("PositionX", Btn1horizpos);
+			xChoiceBtn1Props.setPropertyValue("PositionY", btnvertpos);
+			
+			xCancelBtnProps.setPropertyValue("PositionX", Cancelhorizpos);
+			xCancelBtnProps.setPropertyValue("PositionY", btnvertpos);
+			
+		} catch (Exception e) {
+			DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
+			// nop - buttons will just be misplaced.
+		}
 	}
 	
 	public class ActionListenerImpl extends com.sun.star.lib.uno.helper.WeakBase implements XActionListener
