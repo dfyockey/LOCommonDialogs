@@ -166,7 +166,7 @@ public abstract class loDialogBox implements AutoCloseable {
 		XMultiPropertySet xMPSet = _insertPreProc("TextField", "com.sun.star.awt.UnoControlEditModel");
 		xMPSet.setPropertyValues(
 			new String[] {"Align", "Border", "Height", "PositionX", "PositionY", "Text", "Width"},		// Remember: Alphabetical Order!
-			new Object[] {_Align, (short)1, _nHeight, _nPosX, _nPosY, "MyText", _nWidth});
+			new Object[] {_Align, (short)2, _nHeight, _nPosX, _nPosY, "MyText", _nWidth});
 		return (XTextComponent) _insertPostProc(XTextComponent.class, xMPSet);
 	}
    
@@ -444,10 +444,10 @@ public abstract class loDialogBox implements AutoCloseable {
 		return xLabelProps;
 	}
 	
-	protected XPropertySet sizeLabel (XModel xDoc, XFixedText guiLabel, String labeltext) {
+	protected void sizeLabel (XPropertySet xLabelProps, XFixedText guiLabel, String labeltext) {
 		// Set Label Width and Height to accommodate its text
 		
-		XPropertySet xLabelProps = formatLabelText(xDoc, guiLabel, labeltext);
+		//XPropertySet xLabelProps = getControlProps(guiLabel);
 		
 		//// Get Label size in pixels necessary to contain its text
 		XLayoutConstrains xLayoutConstrains = UnoRuntime.queryInterface(XLayoutConstrains.class, guiLabel);
@@ -469,8 +469,6 @@ public abstract class loDialogBox implements AutoCloseable {
 			e.printStackTrace(System.err);
 			// Label dimensions will just be wrong.
 		}
-		
-		return xLabelProps;
 	}
 	
 	protected void calcLabelAndBtnVertPos () {
@@ -511,8 +509,8 @@ public abstract class loDialogBox implements AutoCloseable {
 	
 	protected XPropertySet getControlProps (Object guiObject) {
 		XControl xControl = UnoRuntime.queryInterface(XControl.class, guiObject);
-		XControlModel xIconControlModel = xControl.getModel();
-		return UnoRuntime.queryInterface(XPropertySet.class, xIconControlModel);
+		XControlModel xControlModel = xControl.getModel();
+		return UnoRuntime.queryInterface(XPropertySet.class, xControlModel);
 	}
 	
 	// I can't remember, but I may have discovered that XStyleSettings provides the method `getApplicationFont()` from use of MRI (the UNO Object Inspection Tool),

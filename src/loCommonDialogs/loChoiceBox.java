@@ -88,7 +88,8 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		guiChoiceBtn1.setLabel(btnlabel1);
 		
 		// Configure Label
-		XPropertySet xLabelProps = sizeLabel(xDoc, guiLabel, labeltext);
+		XPropertySet xLabelProps = formatLabelText(xDoc, guiLabel, labeltext);
+		sizeLabel(xLabelProps, guiLabel, labeltext);
 		calcLabelAndBtnVertPos();
 		setLabelVertPos(xLabelProps);
 		

@@ -114,12 +114,12 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 	public short show(XModel xDoc, String title, String message, String iconURL, boolean cancelbtn) {
 
 		// Configure Icon
-		
 		if (!iconURL.isEmpty())
 			configIcon(guiIcon, iconURL);
 		
 		// Configure Label
-		XPropertySet xLabelProps = sizeLabel(xDoc, guiLabel, message);
+		XPropertySet xLabelProps = formatLabelText(xDoc, guiLabel, message);
+		sizeLabel(xLabelProps, guiLabel, message);
 		calcLabelAndBtnVertPos();
 		setLabelVertPos(xLabelProps);
 		
