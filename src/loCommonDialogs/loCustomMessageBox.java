@@ -100,7 +100,8 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		
 		String iconURL = "";
 		if ( !icontype.isEmpty() ) {
-			iconURL = new ImageProc("/images/" + icontype + ".svg").getURL();
+			//iconURL = new ImageProc("/images/" + icontype + ".svg").getURL();
+			iconURL = new ImageProc().getURL("/images/" + icontype + ".svg");
 		}
 		
 		return show(xDoc, title, message, iconURL, cancelbtn);
@@ -125,6 +126,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		
 		// Calculate Dialog Width and Height
 		dialogwidth = (2*padding) + iconsize + labelwidth + gap;
+		dialogwidth += dialogwidth % 2;
 		dialogheight = btnvertpos + btnheight + padding;
 		
 		setDialogSize();

@@ -156,6 +156,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 			contentwidth = fieldwidth;
 		
 		dialogwidth = (2*padding) + contentwidth;
+		dialogwidth += dialogwidth % 2;
 		dialogheight = btnvertpos + btnheight + padding;
 	}
 	

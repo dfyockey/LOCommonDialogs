@@ -95,6 +95,7 @@ public class loChoiceBox extends loDialogBox implements AutoCloseable {
 		
 		// Calculate Dialog Width and Height
 		dialogwidth = (2*padding) + iconsize + labelwidth + gap;
+		dialogwidth += dialogwidth % 2;
 		dialogheight = btnvertpos + btnheight + padding;
 		
 		setDialogSize();
