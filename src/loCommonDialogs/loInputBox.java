@@ -93,6 +93,10 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
 	
+	public short show(XModel xDoc, String title, String labeltext, String edittext, String ImageUrl) {
+		return show(xDoc, title, labeltext, edittext, 0, ImageUrl);
+	}
+	
 	public short show(XModel xDoc, String title, String labeltext, String edittext, int editwidth, String ImageUrl) {
 		// Set editwidth to 0 to use the default field width equal to btnwidth.
 		
