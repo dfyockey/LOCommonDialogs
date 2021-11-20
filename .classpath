@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="/usr/share/javax-jars/javax.activation-api-1.2.0.jar"/>
-	<classpathentry kind="lib" path="/usr/share/javax-jars/jaxb-api-2.4.0-b180830.0359.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/LibreOffice Libraries [SDK 7.1.4]"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>

@@ -2,8 +2,6 @@ package loCommonDialogs;
 
 import java.util.logging.Level;
 
-import javax.xml.bind.DatatypeConverter;
-
 import com.sun.star.awt.FontDescriptor;
 import com.sun.star.awt.FontWeight;
 import com.sun.star.awt.ImageScaleMode;
@@ -32,8 +30,6 @@ import com.sun.star.container.XNameContainer;
 import com.sun.star.frame.XModel;
 import com.sun.star.graphic.XGraphic;
 import com.sun.star.graphic.XGraphicProvider;
-import com.sun.star.io.XInputStream;
-import com.sun.star.io.XOutputStream;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
@@ -188,19 +184,6 @@ public abstract class loDialogBox implements AutoCloseable {
 		return (XControl) _insertPostProc(XControl.class, xMPSet);
 	}
 	
-	// Hexbinary-based Image
-	protected XControl insertImage(int _nPosX, int _nPosY, int _nWidth, int _nHeight, byte[] _ImageHexbinary, String imgtype) throws com.sun.star.uno.Exception {
-		XMultiPropertySet xMPSet = _insertPreProc("Image", "com.sun.star.awt.UnoControlImageControlModel");
-		short _mode = ImageScaleMode.NONE;
-		
-		XGraphic xGraphic = getGraphic(_ImageHexbinary, imgtype);
-		
-		xMPSet.setPropertyValues(
-			new String[] {"Border", "Graphic", "Height", "PositionX", "PositionY", "ScaleMode", "Width"},	// Remember: Alphabetical Order!
-			new Object[] {(short)0, xGraphic, _nHeight, _nPosX, _nPosY, _mode, _nWidth});
-		return (XControl) _insertPostProc(XControl.class, xMPSet);
-	}
-	
 	protected XControl insertFixedLine(int _nPosX, int _nPosY, int _nWidth, int _nHeight) throws com.sun.star.uno.Exception {
 		XMultiPropertySet xMPSet = _insertPreProc("Line", "com.sun.star.awt.UnoControlFixedLineModel");
 		xMPSet.setPropertyValues(
@@ -264,55 +247,28 @@ public abstract class loDialogBox implements AutoCloseable {
 			e.printStackTrace(System.err);
 		}
 	}
-	
-	protected XGraphic getGraphic(byte[] _rawimage, String imgtype) throws com.sun.star.uno.Exception {
-		
-		Object oPipe = xMCF.createInstanceWithContext("com.sun.star.io.Pipe", xContext);
-		
-		// Nonintuitivly, we use an *XOutputStream* to write the image info *into* the Pipe...
-		XOutputStream xOStream = UnoRuntime.queryInterface(XOutputStream.class, oPipe);
-		xOStream.writeBytes(_rawimage);
-		xOStream.closeOutput();
-		
-		XInputStream xIStream = UnoRuntime.queryInterface(XInputStream.class, oPipe);
-		
-        PropertyValue[] mediaProps = new PropertyValue[2];
-        mediaProps[0] = new PropertyValue();
-        mediaProps[0].Name = "InputStream";
-        mediaProps[0].Value = xIStream;
-        mediaProps[1] = new PropertyValue();
-        mediaProps[1].Name = "MimeType";
-        mediaProps[1].Value = "image/" + imgtype;
-	
-		// Instantiate a GraphicProvider
-		Object oGraphicProvider = xMCF.createInstanceWithContext("com.sun.star.graphic.GraphicProvider", xContext);
-		XGraphicProvider xGraphicProvider = UnoRuntime.queryInterface(XGraphicProvider.class, oGraphicProvider);
-		
-		XGraphic xGraphic = xGraphicProvider.queryGraphic(mediaProps);
-		
-		return xGraphic;
+
+	// creates a UNO graphic object that can be used to be assigned 
+	// to the property "Graphic" of a controlmodel
+	// (from https://wiki.openoffice.org/wiki/Documentation/DevGuide/GUI/Command_Button) 
+	protected XGraphic getGraphic(String ImageUrl){
+		XGraphic xGraphic = null;
+		try {
+			// create a GraphicProvider at the global service manager...
+			Object oGraphicProvider = xMCF.createInstanceWithContext("com.sun.star.graphic.GraphicProvider", xContext);
+			XGraphicProvider xGraphicProvider = (XGraphicProvider) UnoRuntime.queryInterface(XGraphicProvider.class, oGraphicProvider);
+			// create the graphic object
+			PropertyValue[] aPropertyValues = new PropertyValue[1];
+			PropertyValue aPropertyValue = new PropertyValue();
+			aPropertyValue.Name = "URL";
+			aPropertyValue.Value = ImageUrl;
+			aPropertyValues[0] = aPropertyValue;
+			xGraphic = xGraphicProvider.queryGraphic(aPropertyValues);
+			return xGraphic;
+		} catch (com.sun.star.uno.Exception ex) {
+			throw new java.lang.RuntimeException("cannot happen...");
+		}
 	}
-	
-	  // creates a UNO graphic object that can be used to be assigned 
-	  // to the property "Graphic" of a controlmodel
-	  // (from https://wiki.openoffice.org/wiki/Documentation/DevGuide/GUI/Command_Button) 
-	  public XGraphic getGraphic(String ImageUrl){
-	  XGraphic xGraphic = null;
-	  try{
-	      // create a GraphicProvider at the global service manager...
-	      Object oGraphicProvider = xMCF.createInstanceWithContext("com.sun.star.graphic.GraphicProvider", xContext);
-	      XGraphicProvider xGraphicProvider = (XGraphicProvider) UnoRuntime.queryInterface(XGraphicProvider.class, oGraphicProvider);
-	      // create the graphic object
-	      PropertyValue[] aPropertyValues = new PropertyValue[1];
-	      PropertyValue aPropertyValue = new PropertyValue();
-	      aPropertyValue.Name = "URL";
-	      aPropertyValue.Value = ImageUrl;
-	      aPropertyValues[0] = aPropertyValue;
-	      xGraphic = xGraphicProvider.queryGraphic(aPropertyValues);
-	      return xGraphic;
-	  }catch (com.sun.star.uno.Exception ex){
-	      throw new java.lang.RuntimeException("cannot happen...");
-	  }}
 	
 	protected void initialize(String[] PropertyNames, Object[] PropertyValues) {
 		try {
@@ -378,29 +334,6 @@ public abstract class loDialogBox implements AutoCloseable {
 		while ( _xElementContainer.hasByName(_sElementName + Integer.toString(i)) )
 			++i;
 		return _sElementName + Integer.toString(i);
-	}
-	
-	protected void configIconFromHexBinary (XControl guiIcon, String rawhexPng) {
-		XPropertySet xIconProps = null;
-		XGraphic 	 xGraphic	= null;
-		
-		if ( rawhexPng != null ) {
-			byte[] hexbinaryIcon = DatatypeConverter.parseHexBinary(rawhexPng);
-			
-			// If getGraphic throws, just continue; the default icon will be used.
-			try {
-				xGraphic = getGraphic(hexbinaryIcon, "png");
-				
-				//// Get Label XPropertySet interface
-				xIconProps = getControlProps(guiIcon);
-				
-				if (xIconProps != null)
-					xIconProps.setPropertyValue("Graphic", xGraphic);				
-			} catch (Exception e) {
-				DlgLogger.log(null, loDialogBox.class.getName(), Level.WARNING, e);
-				// nop - There'll just be no custom icon.
-			}
-		}
 	}
 	
 	protected void configIcon (XControl guiIcon, String ImageUrl) {
