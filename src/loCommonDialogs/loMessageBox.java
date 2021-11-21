@@ -1,31 +1,28 @@
+/* loMessageBox.java -- part of LOCommonDialogs
+ * 
+ * LOCommonDialogs - Dialogs for LibreOffice providing commonly needed functionality
+ * Copyright © 2016-2018, 2021 David Yockey
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+
 package loCommonDialogs;
 
 import java.util.logging.Level;
 
-// Title  : loMessageBox - Java class to display a messagebox in a LibreOffice document
-// Author : David Yockey
-// Email  : software@diffengine.net
-//
-// Based on hol.sten's "Java and Java script solution" at https://forum.openoffice.org/en/forum/viewtopic.php?f=45&t=2721
-//
-// Reference version: LibreOffice 5.0 SDK API Reference
-
-/*
-   Copyright 2016 David Yockey
-
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
-*/
-
+// loMessageBox - Java class to display a standard messagebox in a LibreOffice document
 
 /*
 // USAGE INFORMATION
@@ -76,7 +73,6 @@ import java.util.logging.Level;
 	const short 	RETRY	= 4		The user pressed the "Retry" button. 
 	const short 	IGNORE	= 5		The user pressed the "Ignore" button.
 */
-
 
 import com.sun.star.awt.MessageBoxType;
 import com.sun.star.awt.XMessageBox;

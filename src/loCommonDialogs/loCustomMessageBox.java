@@ -1,3 +1,23 @@
+/* loCustomMessageBox.java -- a part of LOCommonDialogs
+ * 
+ * LOCommonDialogs - Dialogs for LibreOffice providing commonly needed functionality
+ * Copyright © 2016-2018, 2021 David Yockey
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+
 package loCommonDialogs;
 
 import java.util.logging.Level;
@@ -66,7 +86,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
 	
-	// Convenience method for show with no cancel button
+	// Convenience method for show (iconIndex) with no cancel button
 	public short show(XModel xDoc, String title, String message, int iconIndex) {
 		return show(xDoc, title, message, iconIndex, false);
 	}
@@ -107,7 +127,7 @@ public class loCustomMessageBox extends loDialogBox implements AutoCloseable {
 		return show(xDoc, title, message, iconURL, cancelbtn);
 	}
 	
-	// Convenience method for show with no cancel button
+	// Convenience method for show (iconURL) with no cancel button
 	public short show(XModel xDoc, String title, String message, String iconURL) {
 		return show(xDoc, title, message, iconURL, false);
 	}	

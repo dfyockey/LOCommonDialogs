@@ -1,22 +1,28 @@
+/* loInputBox.java -- part of LOCommonDialogs
+ * 
+ * LOCommonDialogs - Dialogs for LibreOffice providing commonly needed functionality
+ * Copyright © 2016-2018, 2021 David Yockey
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ */
+
 package loCommonDialogs;
 
 import java.util.logging.Level;
 
-
-// Title  : loInputBox - Java class to display a simple inputbox in a LibreOffice document
-// Author : David Yockey
-// Email  : software@diffengine.net
-//
-// Based on UnoDialogSample.java, located at http://api.libreoffice.org/examples/DevelopersGuide/GUI/UnoDialogSample.java
-
-/*************************************************************************
-*  Copyright 2016, 2021 David Yockey
-* 
-*  Code on which portions of this file are based were made available
-*  subject to the terms of the 3-clause BSD license,
-*  Copyright 2000, 2010 Oracle and/or its affiliates.
-*  
-*************************************************************************/
+// loInputBox - Java class to display a simple inputbox in a LibreOffice document
 
 /*
 // USAGE INFORMATION
@@ -24,8 +30,6 @@ import java.util.logging.Level;
 // Instantiate loInputBox, and then call show() with appropriate values
 // for its parameters to display an inputbox.  Upon return, call gettext()
 // to retrieve text typed in the inputbox's edit box.
-//
-// Do NOT call close(). It will be called automatically when necessary.
 
  * Return Values:
  * 
@@ -93,6 +97,7 @@ public class loInputBox extends loDialogBox implements AutoCloseable {
 		xDialog = UnoRuntime.queryInterface(XDialog.class, m_xDialogControl);
 	}
 	
+	// Convenience method for show with editwidth equal to btnwidth.
 	public short show(XModel xDoc, String title, String labeltext, String edittext, String ImageUrl) {
 		return show(xDoc, title, labeltext, edittext, 0, ImageUrl);
 	}
